@@ -122,7 +122,7 @@ def put_time_in_file(year):
         data.append([shift_player['Player'][0], ids[i], total_play / total_presence, (total_play / nb_game) / 60,
                      total_play / 60, nb_game])
     df = pd.DataFrame(data, columns=['name', 'id', 'mean_duration', 'mean_game', 'total', 'game_played'])
-    df.to_csv("time_data_" + str(year) + ".csv", index=False)
+    df.to_csv("time_dat/time_data_" + str(year) + ".csv", index=False)
 
 
 def generate_time_data_files():
@@ -147,5 +147,18 @@ def team_goals(year):
         else:
             goals_against[pbp['Home_Team'][i]] += 1
 
+    data = []
+    for team in teams:
+        data.append([team, goals_for[team], goals_against[team]])
+    df = pd.DataFrame(data, columns=['team', 'goals_for', 'goals_against'])
+    df.to_csv("team_goal/team_goal_data_" + str(year) + ".csv", index=False)
 
-team_goals(2021)
+
+def create_teams_goal_files():
+    years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+    for year in years:
+        print(year)
+        team_goals(year)
+
+
+create_teams_goal_files()
