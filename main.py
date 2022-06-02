@@ -33,9 +33,9 @@ def create_shot_file():
         writer.writerow(header)
 
 
-def create_time_file():
+def create_shot_file():
     shot_template = 'shot_data.csv'
-    header = ['name', 'id', 'mean_duration', 'mean_game', 'total', 'game_played']
+    header = ['year', 'shot', 'miss', 'block', 'goal', 'total']
     data = [
         [2007, 0, 0, 0, 0, 0, 0],
         [2008, 0, 0, 0, 0, 0, 0],
@@ -132,4 +132,20 @@ def generate_time_data_files():
         put_time_in_file(year)
 
 
-generate_time_data_files()
+def team_goals(year):
+    pbp = read_pbp(year)
+    pbp = pbp[pbp["Game_Id"] < 30000]
+    pbp = pbp[pbp["Event"] == "GOAL"]
+    pbp = pbp.reset_index()
+    teams = list(set(pbp['Ev_Team']))
+    goals_for = {key: 0 for key in teams}
+    goals_against = {key: 0 for key in teams}
+    for i in range(len(pbp["Event"])):
+        goals_for[pbp['Ev_Team'][i]] += 1
+        if pbp['Ev_Team'][i] == pbp['Home_Team'][i]:
+            goals_against[pbp['Away_Team'][i]] += 1
+        else:
+            goals_against[pbp['Home_Team'][i]] += 1
+
+
+team_goals(2021)
