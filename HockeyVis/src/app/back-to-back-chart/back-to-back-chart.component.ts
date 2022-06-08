@@ -10,7 +10,6 @@ import { BackToBackService } from '../back-to-back.service';
   providers: [BackToBackService]
 })
 export class BackToBackChartComponent implements OnInit {
-    private width = window.innerWidth;
   
     constructor(private backToBackService : BackToBackService) { 
   }
@@ -21,6 +20,7 @@ export class BackToBackChartComponent implements OnInit {
   @HostListener('window:resize', ['$event'])
     onResize() {
     this.backToBackService.width = window.innerWidth
+    //this.backToBackService.buildBarChart()
   }
 
   
