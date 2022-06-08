@@ -13,10 +13,8 @@ export class Team {
 
   private generateSeasons() : void {
       for (const year of YEARS){
-          const season: Season = {year: year, 
-            goalsScored: 0,
-            goalsAgainst: 0,
-            points: 0, }
+          const season : Season = { year: year, goalsScored: 0, goalsAgainst: 0, points: 0}
+          season.year = year
           this.seasons.push(season)
       }
   }
