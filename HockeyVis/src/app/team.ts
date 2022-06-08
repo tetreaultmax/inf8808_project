@@ -13,14 +13,21 @@ export class Team {
 
   private generateSeasons() : void {
       for (const year of YEARS){
-          const season: Season = {year: year, goalsScored: 0,
+          const season: Season = {year: year, 
+            goalsScored: 0,
             goalsAgainst: 0,
             points: 0, }
           this.seasons.push(season)
       }
   }
 
-  private getName() : string {
+  public getName() : string {
     return this.name
   }
+
+  public getSeasonByYear(year: number) : Season {
+    return this.seasons[year - YEARS[0]]
+  }
+
+
 }

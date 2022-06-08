@@ -1,5 +1,5 @@
 export interface Season {
-    year: string;
+    year: number;
     goalsScored: number;
     goalsAgainst: number;
     points: number;
