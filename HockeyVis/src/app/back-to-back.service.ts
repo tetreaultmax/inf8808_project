@@ -4,16 +4,10 @@ import { YEARS } from 'src/assets/constants';
 import { environment } from 'src/environments/environment';
 import { TeamsService } from './teams.service';
 
-type teamSeason = {
-  teamName: string;
-  goalsScored: number;
-  goalsAgainst: number;
-
-}
-
 @Injectable({
   providedIn: 'root'
 })
+
 export class BackToBackService {
 
   constructor(private http: HttpClient, private teams: TeamsService) { 
@@ -32,10 +26,13 @@ export class BackToBackService {
     const list = data.split('\n')
     for (const season of list.slice(1, list.length -1)){
       const teamSeason = season.split(',')
-      const team = this.teams.getTeamByName(teamSeason[0])
-      console.log(teamSeason[0])
-      console.log(team.getSeasonByYear(year))
-      
+      const teamByYear = this.teams.getTeamByName(teamSeason[0]).getSeasonByYear(year)
+      teamByYear.goalsScored = Number(teamSeason[1])
+      teamByYear.goalsAgainst = Number(teamSeason[2])
     }
   }
+
+  
+
+  
 }
