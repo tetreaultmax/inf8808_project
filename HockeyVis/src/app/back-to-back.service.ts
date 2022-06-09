@@ -1,5 +1,5 @@
-import { HttpClient } from '@angular/common/http';
-import { HostListener, Injectable } from '@angular/core';
+import { HttpClient, ɵHttpInterceptingHandler } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
 import { SEASONS_YEARS, YEARS } from 'src/assets/constants';
 import { environment } from 'src/environments/environment';
@@ -26,7 +26,7 @@ export class BackToBackService {
     const buildBarChart = () => {
       this.buildBarChart()
     }
-    setTimeout( buildBarChart, 200)
+    setTimeout( buildBarChart, 500)
     
 
   }
@@ -49,14 +49,14 @@ export class BackToBackService {
     }
   }
 
-  public buildBarChart() : void{
-    const svg = d3.select('#yAxis')
-      .attr("width", 0.1 * this.width)
-      .attr("height", height + margin.top + margin.bottom)
-        
+  public buildBarChart() : void{   
+    const g = this.createElements()     
     this.setXScale()
     this.setYScale()
-    this.buildYAxe(svg)
+    this.appendRectangles(g, '#leftChart')
+    this.appendRectangles(g, '#rightChart')
+    this.buildYAxe()
+    this.buildXAxe()
     this.buildLeftChart()
     this.buildRightChart()
   }
@@ -66,7 +66,7 @@ export class BackToBackService {
     const goals = team.map(function(d) { return Math.max(d.goalsAgainst, d.goalsScored)  }) as number[]
     this.xScale = d3.scaleLinear()
      .domain([0, d3.max(goals)! ])
-     .range([ 0, this.width * 0.4 ]);
+     .range([ 0, this.width * 0.40 ]);
   }
 
   private setYScale() : void{
@@ -75,63 +75,89 @@ export class BackToBackService {
     .range([0, height])
   }
 
-  private buildYAxe(svg : any): void{
+  private buildYAxe(): void{
+    const svg = d3.select('.y.axis')
     svg.append('g')
-      .attr("transform",
-          "translate(" + 0.075 * this.width + "," + margin.top + ")")
+      .attr("transform", "translate(" + this.width/2  + "," + 0 + ")")
       .call(d3.axisLeft(this.yScale)
-      .tickSizeInner(0)).select(".domain")
-        .remove()
+      .tickSizeInner(0))
+      .select(".domain")
+      .remove()
+  }
+
+  private buildXAxe(): void{
+    d3.select('.x.axis')
+      .attr("width", this.width)
+      .attr("height", 40)
   }
 
   private buildLeftChart() : void {
     const svg = d3.select('#leftChart')
-    .attr("transform",
-          "translate(" + 0 + "," + margin.top + ")")
         .attr("width", 0.40 * this.width)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height", height)
     this.addLeftBands(svg)
   }
 
   private buildRightChart() : void {
     const svg = d3.select('#rightChart')
-        .attr("transform",
-          "translate(" + 0 + "," + margin.top + ")")
         .attr("width", 0.40 * this.width)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height", height)
     this.addRightBands(svg)
   } 
+
+  private appendRectangles(g : d3.Selection<SVGGElement, unknown, HTMLElement, any>, toSelect : string) : void{
+    const team = this.teams.getTeamByName('MTL').seasons
+    g.selectAll(toSelect)
+      .data(team)
+      .enter()
+      .append('g')
+      .append('rect')
+  }
   
   private addLeftBands(svg : any) : void{
     const team = this.teams.getTeamByName('MTL').seasons
-    console.log(team)
 
-    svg.selectAll('rect')
-      .data(team)
-      .enter()
-      .append('rect')
-      .attr('x', (d: { goalsAgainst: d3.NumberValue; }) => { return 0.40 * this.width - this.xScale(d.goalsAgainst); })
-      .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) ).toString()))})
-      .attr("width", (d: { goalsAgainst: d3.NumberValue; }) => { return this.xScale(d.goalsAgainst); })
-      .attr("height", this.yScale.bandwidth() - 25)
-      .attr('fill', 'red')
-      .attr('opacity', 0.5)
+    const xPosition = (goals: number) : number => 0.40 * this.width - this.xScale(goals)
 
+    // svg.selectAll('rect')
+    //   .enter()
+    //   .attr('y', xPosition(this.data))
+    //   //.attr("width", (d: { goalsAgainst: d3.NumberValue; }) => { return this.xScale(d.goalsAgainst); })
+    //   .attr("height", this.yScale.bandwidth() - 25)
+    //   .attr('fill', 'red')
+    //   .attr('opacity', 0.5)
+  
+    
   }
 
   private addRightBands(svg : any) : void{
     const team = this.teams.getTeamByName('MTL').seasons
-    console.log(team)
 
     svg.selectAll('rect')
-      .data(team)
-      .enter()
-      .append('rect')
       .attr('x', 0)
       .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) ).toString()))})
-      .attr("width", (d: { goalsScored: d3.NumberValue; }) => { return this.xScale(d.goalsScored); })
-      .attr("height", this.yScale.bandwidth() - 25)
+      .attr('width', (d: { goalsScored: d3.NumberValue; }) => { return this.xScale(d.goalsScored); })
+      .attr('height', this.yScale.bandwidth() - 25)
       .attr('fill', 'red')
-
   }
+
+  private createElements() : d3.Selection<SVGGElement, unknown, HTMLElement, any> {
+    const div = d3.select('#dataviz')
+      .attr('width', this.width)
+      .attr('height', height)
+    const svg = div.append('svg').attr('class', 'bar-chart')
+      .attr('width', this.width)
+      .attr('height', height)
+    const g = svg.append('g').attr('id', 'graph')
+    g.append('g').attr('class', 'x axis')
+    g.append('g').attr('class', 'y axis')
+    g.append('g').attr('id', 'leftChart')
+    g.append('g').attr('id', 'rightChart')
+    return g
+  }
+}
+
+
+function d(d: any): string | number | boolean | readonly (string | number)[] | d3.ValueFn<d3.EnterElement, unknown, string | number | boolean | readonly (string | number)[] | null> | null {
+  throw new Error('Function not implemented.');
 }

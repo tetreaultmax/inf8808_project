@@ -20,7 +20,7 @@ export class BackToBackChartComponent implements OnInit {
   @HostListener('window:resize', ['$event'])
     onResize() {
     this.backToBackService.width = window.innerWidth
-    //this.backToBackService.buildBarChart()
+    window.location.reload();
   }
 
   
