@@ -13,8 +13,12 @@ const margin = {top: 20, right: 30, bottom: 40, left: 90},
 
 export class BackToBackService {
   public width : number = window.innerWidth
+  public chartWidth : number = 0.45 * this.width
+  public legendWidth : number = 0.1 * this.width
+  public selectedTeams : string[] = ['MTL', 'LAK']
   private xScale!: d3.ScaleLinear<number, number, never>
   private yScale!: d3.ScaleBand<string>
+  private colorScale!: d3.ScaleOrdinal<string, unknown, never>
 
 
   constructor(private http: HttpClient, private teams: TeamsService) { 
@@ -50,15 +54,22 @@ export class BackToBackService {
   }
 
   public buildBarChart() : void{   
-    const g = this.createElements()     
+    this.createElements()     
     this.setXScale()
     this.setYScale()
-    this.appendRectangles(g, '#leftChart')
-    this.appendRectangles(g, '#rightChart')
+    this.setColorScale()
     this.buildYAxe()
     this.buildXAxe()
-    this.buildLeftChart()
-    this.buildRightChart()
+    let counter = 0
+    for (const team of this.selectedTeams) {
+      this.appendRectangles('.leftChart', team)
+      this.appendRectangles('.rightChart', team)
+      this.buildLeftChart()
+      this.buildRightChart()
+      this.addRightBands(counter, team)
+      this.addLeftBands(counter, team)
+      counter ++
+    }
   }
 
   private setXScale() : void{
@@ -66,21 +77,28 @@ export class BackToBackService {
     const goals = team.map(function(d) { return Math.max(d.goalsAgainst, d.goalsScored)  }) as number[]
     this.xScale = d3.scaleLinear()
      .domain([0, d3.max(goals)! ])
-     .range([ 0, this.width * 0.40 ]);
+     .range([ 0, this.chartWidth ]);
   }
 
   private setYScale() : void{
     this.yScale = d3.scaleBand()
     .domain(SEASONS_YEARS.reverse())
     .range([0, height])
+    .paddingInner(0.3)
+  }
+
+  private setColorScale() : void{
+    this.colorScale = d3.scaleOrdinal(d3.schemeSet1).domain(this.selectedTeams)
   }
 
   private buildYAxe(): void{
     const svg = d3.select('.y.axis')
+    .attr('width', this.legendWidth)
+    .attr("transform", "translate(" + (this.chartWidth + this.legendWidth/2 + 3)  + "," + 0 + ")")
     svg.append('g')
-      .attr("transform", "translate(" + this.width/2  + "," + 0 + ")")
       .call(d3.axisLeft(this.yScale)
       .tickSizeInner(0))
+      .attr('text-anchor', 'middle')
       .select(".domain")
       .remove()
   }
@@ -93,55 +111,58 @@ export class BackToBackService {
 
   private buildLeftChart() : void {
     const svg = d3.select('#leftChart')
-        .attr("width", 0.40 * this.width)
+        .attr("width", this.chartWidth)
         .attr("height", height)
-    this.addLeftBands(svg)
+    
   }
 
   private buildRightChart() : void {
     const svg = d3.select('#rightChart')
-        .attr("width", 0.40 * this.width)
+        .attr("width", this.chartWidth)
         .attr("height", height)
-    this.addRightBands(svg)
   } 
 
-  private appendRectangles(g : d3.Selection<SVGGElement, unknown, HTMLElement, any>, toSelect : string) : void{
-    const team = this.teams.getTeamByName('MTL').seasons
-    g.selectAll(toSelect)
-      .data(team)
+  private appendRectangles(toSelect : string, teamSelected : string) : void{
+    const team = this.teams.getTeamByName(teamSelected).seasons
+    const svg = d3.select(toSelect).selectAll('.bar-chart')
+    svg.data(team)
       .enter()
       .append('g')
       .append('rect')
+      .attr('class', teamSelected)
   }
   
-  private addLeftBands(svg : any) : void{
-    const team = this.teams.getTeamByName('MTL').seasons
-
-    const xPosition = (goals: number) : number => 0.40 * this.width - this.xScale(goals)
-
-    // svg.selectAll('rect')
-    //   .enter()
-    //   .attr('y', xPosition(this.data))
-    //   //.attr("width", (d: { goalsAgainst: d3.NumberValue; }) => { return this.xScale(d.goalsAgainst); })
-    //   .attr("height", this.yScale.bandwidth() - 25)
-    //   .attr('fill', 'red')
-    //   .attr('opacity', 0.5)
-  
-    
+  private addLeftBands(counter : number, team : string) : void{
+    const g = d3.select('.leftChart') as any
+    const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
+    const color = this.colorScale(team)
+    g.selectAll('rect.' + team)
+      .transition()
+      .duration(500)
+      .attr("width", (d: { goalsAgainst: number }) => { return this.xScale(d.goalsAgainst); })
+      .attr("height", 0.7 * this.yScale.bandwidth()/this.selectedTeams.length)
+      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset })
+      .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst); })
+      .attr('fill', color)
+      .attr('opacity', '0.5')
+      
   }
 
-  private addRightBands(svg : any) : void{
-    const team = this.teams.getTeamByName('MTL').seasons
-
-    svg.selectAll('rect')
-      .attr('x', 0)
-      .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) ).toString()))})
+  private addRightBands(counter : number, team : string) : void{
+    const g = d3.select('.rightChart') as any
+    const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
+    const color = this.colorScale(team)
+    g.selectAll('rect.' + team)
+      .transition()
+      .duration(500)
+      .attr('x', this.chartWidth + this.legendWidth)
+      .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) ).toString()))! + offset })
       .attr('width', (d: { goalsScored: d3.NumberValue; }) => { return this.xScale(d.goalsScored); })
-      .attr('height', this.yScale.bandwidth() - 25)
-      .attr('fill', 'red')
+      .attr('height', 0.7 * this.yScale.bandwidth()/this.selectedTeams.length)
+      .attr('fill', color)
   }
 
-  private createElements() : d3.Selection<SVGGElement, unknown, HTMLElement, any> {
+  private createElements() : void {
     const div = d3.select('#dataviz')
       .attr('width', this.width)
       .attr('height', height)
@@ -151,9 +172,8 @@ export class BackToBackService {
     const g = svg.append('g').attr('id', 'graph')
     g.append('g').attr('class', 'x axis')
     g.append('g').attr('class', 'y axis')
-    g.append('g').attr('id', 'leftChart')
-    g.append('g').attr('id', 'rightChart')
-    return g
+    g.append('g').attr('class', 'leftChart')
+    g.append('g').attr('class', 'rightChart')
   }
 }
 
