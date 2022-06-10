@@ -108,6 +108,19 @@ export class BackToBackService {
       .remove()
   }
 
+  // private buildLegend() : void{
+  //   const legend = d3Legend.legendColor()
+  //   .shape('circle')
+  //   .title('Légende')
+
+  //   .scale(colorScale)
+  //   d3.select('.legend')
+  //     .attr('width', this.width/2)
+  //     .attr('height', 30)
+  //   const axis = d3.axisRight
+
+  // }
+
   private buildXAxe(): void{
     const svg = d3.select('.x.axis')
       .attr("width", this.width)
@@ -172,6 +185,7 @@ export class BackToBackService {
         d3.select(d.target).attr('height',sizeBar)
         .attr('opacity', 1)
       })
+      
     
     g.selectAll('text.' + team)
       .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset + sizeBar -1})
@@ -229,6 +243,7 @@ export class BackToBackService {
       .attr('width', this.width)
       .attr('height', height + 50)
     const g = svg.append('g').attr('id', 'graph')
+    g.append('g').attr('class', 'legend')
     g.append('g').attr('class', 'x axis')
     g.append('g').attr('class', 'y axis')
     g.append('g').attr('class', 'leftChart')
