@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 import { TeamsService } from './teams.service';
 
 const margin = {top: 20, right: 30, bottom: 40, left: 90},
-    height = 600 - margin.top - margin.bottom;
+    height = 700 - margin.top - margin.bottom;
 @Injectable({
   providedIn: 'root'
 })
@@ -15,7 +15,7 @@ export class BackToBackService {
   public width : number = window.innerWidth
   public chartWidth : number = 0.45 * this.width
   public legendWidth : number = 0.1 * this.width
-  public selectedTeams : string[] = ['MTL', 'LAK']
+  public selectedTeams : string[] = ['MTL', 'LAK', 'SJS']
   private xScale!: d3.ScaleLinear<number, number, never>
   private yScale!: d3.ScaleBand<string>
   private colorScale!: d3.ScaleOrdinal<string, unknown, never>
@@ -66,11 +66,15 @@ export class BackToBackService {
       this.appendRectangles('.rightChart', team)
       this.buildLeftChart()
       this.buildRightChart()
-      this.addRightBands(counter, team)
-      this.addLeftBands(counter, team)
+      this.addRightBands(counter, team)//, this.xScale, this.yScale, this.colorScale, this.selectedTeams, this.chartWidth, this.legendWidth)
+      this.addLeftBands(counter, team)//, this.xScale, this.yScale, this.colorScale, this.selectedTeams, this.chartWidth)
+      // this.addNumber('.leftChart', counter)
+      // this.addNumber('.rightChart', counter)
       counter ++
     }
   }
+
+  //counter : number, team : string, xScale : any, yScale : any, colorScale : any, selectedTeams : string [], chartWidth : number
 
   private setXScale() : void{
     const team = this.teams.getTeamByName('MTL').seasons
@@ -84,11 +88,11 @@ export class BackToBackService {
     this.yScale = d3.scaleBand()
     .domain(SEASONS_YEARS.reverse())
     .range([0, height])
-    .paddingInner(0.3)
+    .paddingInner(0.2)
   }
 
   private setColorScale() : void{
-    this.colorScale = d3.scaleOrdinal(d3.schemeSet1).domain(this.selectedTeams)
+    this.colorScale = d3.scaleOrdinal(d3.schemeDark2).domain(this.selectedTeams)
   }
 
   private buildYAxe(): void{
@@ -125,10 +129,12 @@ export class BackToBackService {
   private appendRectangles(toSelect : string, teamSelected : string) : void{
     const team = this.teams.getTeamByName(teamSelected).seasons
     const svg = d3.select(toSelect).selectAll('.bar-chart')
-    svg.data(team)
+    const g = svg.data(team)
       .enter()
       .append('g')
-      .append('rect')
+    g.append('rect')
+      .attr('class', teamSelected)
+    g.append('text')
       .attr('class', teamSelected)
   }
   
@@ -136,31 +142,69 @@ export class BackToBackService {
     const g = d3.select('.leftChart') as any
     const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
     const color = this.colorScale(team)
+    const sizeBar = 0.95 * this.yScale.bandwidth()/this.selectedTeams.length
     g.selectAll('rect.' + team)
-      .transition()
-      .duration(500)
       .attr("width", (d: { goalsAgainst: number }) => { return this.xScale(d.goalsAgainst); })
-      .attr("height", 0.7 * this.yScale.bandwidth()/this.selectedTeams.length)
+      .attr("height", sizeBar )
       .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset })
       .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst); })
       .attr('fill', color)
-      .attr('opacity', '0.5')
-      
+      .on('mouseover',  function(d: any){
+        d3.select(d.target).attr('height', sizeBar * 1.2)
+          .attr('opacity', 0.5)
+      })
+      .on('mouseout',  function(d: any){
+        d3.select(d.target).attr('height',sizeBar)
+        .attr('opacity', 1)
+      })
+    
+    g.selectAll('text.' + team)
+      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset + sizeBar -1})
+      .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst) + 5; })
+      .attr('font-size', '11px')
+      .attr('fill','white')
+      .text((d: { goalsAgainst: number }) => { return d.goalsAgainst})
   }
 
   private addRightBands(counter : number, team : string) : void{
     const g = d3.select('.rightChart') as any
     const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
     const color = this.colorScale(team)
+    const sizeBar = 0.95 * this.yScale.bandwidth()/this.selectedTeams.length
     g.selectAll('rect.' + team)
-      .transition()
-      .duration(500)
       .attr('x', this.chartWidth + this.legendWidth)
-      .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) ).toString()))! + offset })
+      .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) )))! + offset })
       .attr('width', (d: { goalsScored: d3.NumberValue; }) => { return this.xScale(d.goalsScored); })
-      .attr('height', 0.7 * this.yScale.bandwidth()/this.selectedTeams.length)
+      .attr('height', sizeBar)
       .attr('fill', color)
+      .on('mouseover',  function(d: any){
+        d3.select(d.target).attr('height', sizeBar * 1.2)
+          .attr('opacity', 0.5)
+      })
+      .on('mouseout',  function(d: any){
+        d3.select(d.target).attr('height',sizeBar)
+        .attr('opacity', 1)
+      })
+    
+    g.selectAll('text.' + team)
+      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset + sizeBar -2 })
+      .attr('x', (d: { goalsScored: number }) => { return this.chartWidth + this.legendWidth + this.xScale(d.goalsScored) - 20; })
+      .attr('font-size', '11px')
+      .attr('fill','white')
+      .text((d: { goalsAgainst: number }) => { return d.goalsAgainst})
+      
+    
   }
+
+  // private addNumber(toSelect : string, counter : number){
+  //   const g = d3.select(toSelect) as any
+  //   const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
+  //   g.selectAll('text')
+  //     .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset })
+  //     .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst); })
+  //     .text('allo')
+
+  // }
 
   private createElements() : void {
     const div = d3.select('#dataviz')
@@ -177,7 +221,34 @@ export class BackToBackService {
   }
 }
 
+// function addLeftBands(counter : number, team : string, xScale : any, yScale : any, colorScale : any, selectedTeams : string [], chartWidth : number){
+//   const g = d3.select('.leftChart') as any
+//   const offset = yScale.bandwidth()/selectedTeams.length * counter
+//   const color = colorScale(team)
+//   g.selectAll('rect.' + team)
+//     .transition()
+//     .duration(500)
+//     .attr("width", (d: { goalsAgainst: number }) => { return xScale(d.goalsAgainst); })
+//     .attr("height", 0.7 * yScale.bandwidth()/selectedTeams.length)
+//     .attr('y', (d: { year: number }) => { return yScale(d.year + '-' + (d.year + 1))! + offset })
+//     .attr('x', (d: { goalsAgainst: number }) => { return chartWidth - xScale(d.goalsAgainst); })
+//     .attr('fill', color)
+//     .attr('opacity', '0.5')
+// }
 
-function d(d: any): string | number | boolean | readonly (string | number)[] | d3.ValueFn<d3.EnterElement, unknown, string | number | boolean | readonly (string | number)[] | null> | null {
-  throw new Error('Function not implemented.');
-}
+// function addRightBands(counter : number, team : string, xScale : any, yScale : any, colorScale : any, selectedTeams : string [], chartWidth : number, legendWidth : number) {
+//   const g = d3.select('.rightChart') as any
+//   const offset = yScale.bandwidth()/selectedTeams.length * counter
+//   const color = colorScale(team)
+//   g.selectAll('rect.' + team)
+//     .transition()
+//     .duration(500)
+//     .attr('x', chartWidth + legendWidth)
+//     .attr('y', (d: { year: number; }) => { return yScale(((d.year + '-' + (d.year + 1) ).toString()))! + offset })
+//     .attr('width', (d: { goalsScored: d3.NumberValue; }) => { return xScale(d.goalsScored); })
+//     .attr('height', 0.7 * yScale.bandwidth()/selectedTeams.length)
+//     .attr('fill', color)
+//     // .on('mouseover',  function(d: any){
+//     //   d3.select(d.target).attr('opacity', '0.5')
+//     // })
+//   }
