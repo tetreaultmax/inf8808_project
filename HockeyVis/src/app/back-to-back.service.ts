@@ -103,14 +103,29 @@ export class BackToBackService {
       .call(d3.axisLeft(this.yScale)
       .tickSizeInner(0))
       .attr('text-anchor', 'middle')
+      .attr('font-size', '15px')
       .select(".domain")
       .remove()
   }
 
   private buildXAxe(): void{
-    d3.select('.x.axis')
+    const svg = d3.select('.x.axis')
       .attr("width", this.width)
       .attr("height", 40)
+    svg.append('text')
+      .attr("transform", "translate(" + 0 + "," + (height + 30)  + ")")
+      .text('Buts encaissés')
+      .attr('font-size', 30)
+    svg.append('text')
+      .attr("transform", "translate(" + (this.width - margin.right) + "," + (height + 30)  + ")")
+      .style('text-anchor', 'end')
+      .text('Buts marqués')
+      .attr('font-size', 30)
+    svg.append('text')
+      .attr("transform", "translate(" + (this.width/2) + "," + (height + 30)  + ")")
+      .style('text-anchor', 'middle')
+      .text('Saison')
+      .attr('font-size', 30)
   }
 
   private buildLeftChart() : void {
@@ -212,7 +227,7 @@ export class BackToBackService {
       .attr('height', height)
     const svg = div.append('svg').attr('class', 'bar-chart')
       .attr('width', this.width)
-      .attr('height', height)
+      .attr('height', height + 50)
     const g = svg.append('g').attr('id', 'graph')
     g.append('g').attr('class', 'x axis')
     g.append('g').attr('class', 'y axis')
