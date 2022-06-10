@@ -1,8 +1,9 @@
 import { HttpClient, ɵHttpInterceptingHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
-import { SEASONS_YEARS, YEARS } from 'src/assets/constants';
+import {  YEARS } from 'src/assets/constants';
 import { environment } from 'src/environments/environment';
+import { ScaleService } from './scale.service';
 import { TeamsService } from './teams.service';
 
 const margin = {top: 20, right: 30, bottom: 40, left: 90},
@@ -24,7 +25,7 @@ export class BackToBackService {
   private colorScale!: d3.ScaleOrdinal<string, unknown, never>
 
 
-  constructor(private http: HttpClient, private teams: TeamsService) { 
+  constructor(private http: HttpClient, private teams: TeamsService, private scale: ScaleService) { 
     this.setChart()
   }
 
@@ -58,10 +59,10 @@ export class BackToBackService {
 
   public buildBarChart() : void{   
     this.createElements()     
-    this.setXScale()
-    this.setYScale()
-    this.setLegendScale()
-    this.setColorScale()
+    this.xScale =  this.scale.getXScale(this.chartWidth)
+    this.yScale =  this.scale.getYScale(height)
+    this.legendScale = this.scale.getLegendScale(this.selectedTeams, this.width/2)
+    this.colorScale = this.scale.getColorScale(this.selectedTeams)
     this.buildYAxe()
     this.buildXAxe()
     this.buildLegend()
@@ -80,29 +81,6 @@ export class BackToBackService {
   }
 
   //counter : number, team : string, xScale : any, yScale : any, colorScale : any, selectedTeams : string [], chartWidth : number
-
-  private setXScale() : void{
-    const team = this.teams.getTeamByName('MTL').seasons
-    const goals = team.map(function(d) { return Math.max(d.goalsAgainst, d.goalsScored)  }) as number[]
-    this.xScale = d3.scaleLinear()
-     .domain([0, d3.max(goals)! ])
-     .range([ 0, this.chartWidth ]);
-  }
-
-  private setYScale() : void{
-    this.yScale = d3.scaleBand()
-    .domain(SEASONS_YEARS.reverse())
-    .range([0, height])
-    .paddingInner(0.2)
-  }
-
-  private setColorScale() : void{
-    this.colorScale = d3.scaleOrdinal(d3.schemeDark2).domain(this.selectedTeams)
-  }
-
-  private setLegendScale() : void{
-    this.legendScale = d3.scaleBand().domain(this.selectedTeams).range([20, this.width/2])
-  }
 
   private buildYAxe(): void{
     const svg = d3.select('.y.axis')
