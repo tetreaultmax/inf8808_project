@@ -18,7 +18,7 @@ export class BackToBackService {
   public yAxisWidth : number = 0.1 * this.width
   public legendHeight : number = 40
   private xAxisHeight : number = 30
-  private selectedTeams : string[] = ['MTL']
+  private selectedTeams = new Set<string>();
   private xScale!: d3.ScaleLinear<number, number, never>
   private yScale!: d3.ScaleBand<string>
   private legendScale!: d3.ScaleBand<string>
@@ -59,16 +59,17 @@ export class BackToBackService {
   }
   
   private prepareChart(){
-    this.createElements()     
-    this.xScale =  this.scale.getXScale(this.chartWidth)
+    this.createElements()
+    this.xScale =  this.scale.getXScale(this.chartWidth) 
     this.yScale =  this.scale.getYScale(height)
-    this.legendScale = this.scale.getLegendScale(this.selectedTeams, this.width/2)
-    this.colorScale = this.scale.getColorScale(this.selectedTeams)
     this.buildYAxe()
-    this.buildXAxe()
+    this.buildXAxe()   
+    
   }
 
-  public buildBarChart() : void{   
+  public buildBarChart() : void{  
+    this.legendScale = this.scale.getLegendScale(this.selectedTeams, this.width/2)
+    this.colorScale = this.scale.getColorScale(this.selectedTeams) 
     this.buildLegend()
     this.appendRectanglesMenu()
     this.positionTeamMenu()
@@ -117,10 +118,12 @@ export class BackToBackService {
         return legendScale(d) as number
       })
       .attr('cy', this.legendHeight/2)
+      
 
     legend.selectAll('.bar-chart')
       .data(this.selectedTeams)
       .enter()
+      .remove()
       .append('text')
       .text(function(d: string): string{
         return d as string
@@ -131,6 +134,7 @@ export class BackToBackService {
       .attr('y', this.legendHeight/2)
       .style('text-anchor', 'left')
       .style('alignment-baseline', 'middle')
+      
     
   }
 
@@ -181,9 +185,9 @@ export class BackToBackService {
   
   private addLeftBands(counter : number, team : string) : void{
     const g = d3.select('.leftChart') as any
-    const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
+    const offset = this.yScale.bandwidth()/this.selectedTeams.size * counter
     const color = this.colorScale(team)
-    const sizeBar = 0.90 * this.yScale.bandwidth()/this.selectedTeams.length
+    const sizeBar = 0.90 * this.yScale.bandwidth()/this.selectedTeams.size
     g.selectAll('rect.' + team)
       .attr("width", (d: { goalsAgainst: number }) => { return this.xScale(d.goalsAgainst); })
       .attr("height", sizeBar )
@@ -210,9 +214,9 @@ export class BackToBackService {
 
   private addRightBands(counter : number, team : string) : void{
     const g = d3.select('.rightChart') as any
-    const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
+    const offset = this.yScale.bandwidth()/this.selectedTeams.size * counter
     const color = this.colorScale(team)
-    const sizeBar = 0.90 * this.yScale.bandwidth()/this.selectedTeams.length
+    const sizeBar = 0.90 * this.yScale.bandwidth()/this.selectedTeams.size
     g.selectAll('rect.' + team)
       .attr('x', this.chartWidth + this.yAxisWidth)
       .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) )))! + offset + this.legendHeight })
@@ -307,7 +311,7 @@ export class BackToBackService {
   }
 
   addTeam(team: string) : void{
-    this.selectedTeams.push(team)
+    this.selectedTeams.add(team)
     this.buildBarChart()
 
   }

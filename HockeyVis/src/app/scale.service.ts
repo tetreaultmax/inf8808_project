@@ -25,11 +25,11 @@ export class ScaleService {
     .paddingInner(0.2)
   }
 
-  public getColorScale(selectedTeams : string[]) : d3.ScaleOrdinal<string, unknown, never>{
+  public getColorScale(selectedTeams :  Set<string>) : d3.ScaleOrdinal<string, unknown, never>{
     return d3.scaleOrdinal(d3.schemeDark2).domain(selectedTeams)
   }
 
-  public getLegendScale(selectedTeams : string[], width : number) : d3.ScaleBand<string>{
+  public getLegendScale(selectedTeams : Set<string>, width : number) : d3.ScaleBand<string>{
     return d3.scaleBand().domain(selectedTeams).range([20, width])
   }
 
