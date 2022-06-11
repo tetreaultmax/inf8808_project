@@ -21,8 +21,5 @@ export class BackToBackChartComponent implements OnInit {
     onResize() {
     this.backToBackService.width = window.innerWidth
     window.location.reload();
-  }
-
-  
-
+  }  
 }

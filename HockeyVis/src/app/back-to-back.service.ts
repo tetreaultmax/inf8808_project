@@ -1,7 +1,7 @@
 import { HttpClient, ɵHttpInterceptingHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
-import {  YEARS } from 'src/assets/constants';
+import {  TEAM_NAMES, YEARS } from 'src/assets/constants';
 import { environment } from 'src/environments/environment';
 import { ScaleService } from './scale.service';
 import { TeamsService } from './teams.service';
@@ -15,10 +15,10 @@ const margin = {top: 20, right: 30, bottom: 40, left: 90},
 export class BackToBackService {
   public width : number = window.innerWidth
   private chartWidth : number = 0.45 * this.width
-  private yAxisWidth : number = 0.1 * this.width
-  private legendHeight : number = 40
+  public yAxisWidth : number = 0.1 * this.width
+  public legendHeight : number = 40
   private xAxisHeight : number = 30
-  private selectedTeams : string[] = ['MTL', 'LAK']
+  private selectedTeams : string[] = ['MTL']
   private xScale!: d3.ScaleLinear<number, number, never>
   private yScale!: d3.ScaleBand<string>
   private legendScale!: d3.ScaleBand<string>
@@ -32,6 +32,7 @@ export class BackToBackService {
   private setChart() : void{
     this.loadData()
     const buildBarChart = () => {
+      this.prepareChart()
       this.buildBarChart()
     }
     setTimeout( buildBarChart, 500)
@@ -56,8 +57,8 @@ export class BackToBackService {
       teamByYear.goalsAgainst = Number(teamSeason[2])
     }
   }
-
-  public buildBarChart() : void{   
+  
+  private prepareChart(){
     this.createElements()     
     this.xScale =  this.scale.getXScale(this.chartWidth)
     this.yScale =  this.scale.getYScale(height)
@@ -65,22 +66,23 @@ export class BackToBackService {
     this.colorScale = this.scale.getColorScale(this.selectedTeams)
     this.buildYAxe()
     this.buildXAxe()
+  }
+
+  public buildBarChart() : void{   
     this.buildLegend()
+    this.appendRectanglesMenu()
+    this.positionTeamMenu()
     let counter = 0
     for (const team of this.selectedTeams) {
       this.appendRectangles('.leftChart', team)
       this.appendRectangles('.rightChart', team)
       this.buildLeftChart()
       this.buildRightChart()
-      this.addRightBands(counter, team)//, this.xScale, this.yScale, this.colorScale, this.selectedTeams, this.chartWidth, this.legendWidth)
-      this.addLeftBands(counter, team)//, this.xScale, this.yScale, this.colorScale, this.selectedTeams, this.chartWidth)
-      // this.addNumber('.leftChart', counter)
-      // this.addNumber('.rightChart', counter)
+      this.addRightBands(counter, team)
+      this.addLeftBands(counter, team)
       counter ++
     }
   }
-
-  //counter : number, team : string, xScale : any, yScale : any, colorScale : any, selectedTeams : string [], chartWidth : number
 
   private buildYAxe(): void{
     const svg = d3.select('.y.axis')
@@ -181,7 +183,7 @@ export class BackToBackService {
     const g = d3.select('.leftChart') as any
     const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
     const color = this.colorScale(team)
-    const sizeBar = 0.95 * this.yScale.bandwidth()/this.selectedTeams.length
+    const sizeBar = 0.90 * this.yScale.bandwidth()/this.selectedTeams.length
     g.selectAll('rect.' + team)
       .attr("width", (d: { goalsAgainst: number }) => { return this.xScale(d.goalsAgainst); })
       .attr("height", sizeBar )
@@ -189,20 +191,20 @@ export class BackToBackService {
       .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst); })
       .attr('fill', color)
       .on('mouseover',  function(d: any){
-        d3.select(d.target).attr('height', sizeBar * 1.2)
-          .attr('opacity', 0.5)
+        d3.select(d.target).attr('opacity', 0.5)
       })
       .on('mouseout',  function(d: any){
         d3.select(d.target).attr('height',sizeBar)
         .attr('opacity', 1)
       })
       
-    
     g.selectAll('text.' + team)
-      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset + sizeBar -1 + this.legendHeight })
-      .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst) + 5 ; })
-      .attr('font-size', '11px')
+      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset + sizeBar/2 + this.legendHeight })
+      .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst) })
+      .attr('font-size', sizeBar)
       .attr('fill','white')
+      .attr('text-anchor', 'start')
+      .style('alignment-baseline', 'middle')
       .text((d: { goalsAgainst: number }) => { return d.goalsAgainst})
   }
 
@@ -210,7 +212,7 @@ export class BackToBackService {
     const g = d3.select('.rightChart') as any
     const offset = this.yScale.bandwidth()/this.selectedTeams.length * counter
     const color = this.colorScale(team)
-    const sizeBar = 0.95 * this.yScale.bandwidth()/this.selectedTeams.length
+    const sizeBar = 0.90 * this.yScale.bandwidth()/this.selectedTeams.length
     g.selectAll('rect.' + team)
       .attr('x', this.chartWidth + this.yAxisWidth)
       .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) )))! + offset + this.legendHeight })
@@ -218,8 +220,7 @@ export class BackToBackService {
       .attr('height', sizeBar)
       .attr('fill', color)
       .on('mouseover',  function(d: any){
-        d3.select(d.target).attr('height', sizeBar * 1.2)
-          .attr('opacity', 0.5)
+        d3.select(d.target).attr('opacity', 0.5)
       })
       .on('mouseout',  function(d: any){
         d3.select(d.target).attr('height',sizeBar)
@@ -227,10 +228,12 @@ export class BackToBackService {
       })
     
     g.selectAll('text.' + team)
-      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset + sizeBar -2 + this.legendHeight })
-      .attr('x', (d: { goalsScored: number }) => { return this.chartWidth + this.yAxisWidth + this.xScale(d.goalsScored) - 20; })
-      .attr('font-size', '11px')
+      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + offset + sizeBar/2 + this.legendHeight })
+      .attr('x', (d: { goalsScored: number }) => { return this.chartWidth + this.yAxisWidth + this.xScale(d.goalsScored); })
+      .attr('font-size', sizeBar)
       .attr('fill','white')
+      .attr('text-anchor', 'end')
+      .style('alignment-baseline', 'middle')
       .text((d: { goalsScored: number }) => { return d.goalsScored})
   }
 
@@ -242,9 +245,70 @@ export class BackToBackService {
       .attr('height', height + this.legendHeight + this.xAxisHeight + 10)
     const g = svg.append('g').attr('id', 'graph')
     g.append('g').attr('class', 'legend')
+    g.append('g').attr('class', 'menu')
     g.append('g').attr('class', 'x axis')
     g.append('g').attr('class', 'y axis')
     g.append('g').attr('class', 'leftChart')
     g.append('g').attr('class', 'rightChart')
+  }
+
+  private appendRectanglesMenu() : void{
+    const svg = d3.select('.menu').selectAll('.bar-chart')
+    const g = svg.data(TEAM_NAMES)
+      .enter()
+      .append('g')
+    g.append('rect')
+    g.append('text')
+  }
+
+  positionTeamMenu() :void{
+    d3.select('.menu').selectAll('.bar-chart').attr('class', 'menu')
+      .attr('width', this.chartWidth)
+      .attr('height', this.legendHeight) 
+    
+    const g = d3.select('.menu') as any
+    
+    const width = (this.yAxisWidth + this.chartWidth)/TEAM_NAMES.length*2 *0.9
+    const height = this.legendHeight/2 
+    const chartWidth = this.chartWidth
+    const callTeam = (team : string) : void => this.addTeam(team)
+    g.selectAll('rect')
+      .attr('x', function(d : any,i: number): number{
+        return (i < TEAM_NAMES.length/2) ? width * i + chartWidth : width * (i - TEAM_NAMES.length/2) + chartWidth
+      })
+      .attr('y', function(d : any,i: number): number{
+        return (i < TEAM_NAMES.length/2) ? 0 : height
+      })
+      .attr('fill', '#D3D3D3')
+      .attr('stroke', 'black')
+      .attr('width', width)
+      .attr('height', height * 0.9)
+      .on('click',  function(d: any){
+        callTeam(d.srcElement.__data__)
+      })
+    
+    g.selectAll('text')
+      .attr('width', width)
+      .attr('height', height * 0.9)
+      .attr('x', function(d : any,i: number): number{
+        return (i < TEAM_NAMES.length/2) ? width * i + chartWidth : width * (i - TEAM_NAMES.length/2) + chartWidth
+      })
+      .attr('y', function(d : any,i: number): number{
+        return (i < TEAM_NAMES.length/2) ? height *0.8 : 2*(height*0.9)
+      })
+      .attr('fill', 'black')
+      .style('alignment-baseline', 'baseline')
+      .text((d: { goalsScored: number }) => { return d})
+      .attr('font-size', height *0.7)
+      .attr('text-anchor', 'start')
+      .on('click',  function(d: any){
+        callTeam(d.srcElement.__data__)
+      })
+  }
+
+  addTeam(team: string) : void{
+    this.selectedTeams.push(team)
+    this.buildBarChart()
+
   }
 }
