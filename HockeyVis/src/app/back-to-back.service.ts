@@ -123,7 +123,6 @@ export class BackToBackService {
     legend.selectAll('.bar-chart')
       .data(this.selectedTeams)
       .enter()
-      .remove()
       .append('text')
       .text(function(d: string): string{
         return d as string
@@ -259,6 +258,7 @@ export class BackToBackService {
   private appendRectanglesMenu() : void{
     const svg = d3.select('.menu').selectAll('.bar-chart')
     const g = svg.data(TEAM_NAMES)
+      .remove()
       .enter()
       .append('g')
     g.append('rect')
@@ -311,7 +311,17 @@ export class BackToBackService {
   }
 
   addTeam(team: string) : void{
-    this.selectedTeams.add(team)
+    console.log(team)
+    console.log(this.selectedTeams)
+    console.log(this.selectedTeams.has(team))
+    console.log(this.selectedTeams.size)
+    if (this.selectedTeams.has(team)){
+      this.selectedTeams.delete(team)
+      console.log('delete')
+    } else{
+      this.selectedTeams.add(team)
+      console.log('add')
+    }
     this.buildBarChart()
 
   }
