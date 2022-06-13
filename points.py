@@ -1,10 +1,11 @@
 from main import *
 
 
-def correlation_point(year):
+def correlation_point(year, team):
     pbp = read_pbp(year)
     pbp = pbp[pbp["Game_Id"] < 30000]
     pbp = pbp[pbp["Event"] == 'GOAL']
+    pbp = pbp[pbp["Ev_Team"] == team]
     pbp = pbp.reset_index()
     ids = []
     set_ind = set()
@@ -40,3 +41,6 @@ def correlation_point(year):
             points_matrix[id1][id2] += 1
 
     return points_matrix
+
+
+correlation_point(2021, 'MTL')
