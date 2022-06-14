@@ -1,7 +1,6 @@
 import { HttpClient, ɵHttpInterceptingHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
-import { schemeDark2 } from 'd3';
 import {  TEAM_NAMES, YEARS } from 'src/assets/constants';
 import { environment } from 'src/environments/environment';
 import { ScaleService } from './scale.service';
@@ -68,8 +67,6 @@ export class BackToBackService {
   }
 
   public buildBarChart() : void{  
-    // this.legendScale = this.scale.getLegendScale(this.selectedTeams, this.width/2)
-    // this.colorScale = this.scale.getColorScale(this.selectedTeams) 
     this.buildLegend()
     this.positionTeamMenu()
     this.appendRectangles('.leftChart')
@@ -152,8 +149,6 @@ export class BackToBackService {
     const svg = d3.select(toSelect).selectAll('.bar-chart')
     
     d3.select(toSelect).selectAll('g').remove()
-    
-
     svg.selectAll('rect')
       .remove()
     const g = svg.data(team)
@@ -239,7 +234,6 @@ export class BackToBackService {
   private appendRectanglesMenu() : void{
     const svg = d3.select('.menu').selectAll('.bar-chart')
     const g = svg.data(TEAM_NAMES)
-      .remove()
       .enter()
       .append('g')
     g.append('rect')

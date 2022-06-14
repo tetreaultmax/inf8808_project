@@ -13,7 +13,8 @@ export class TeamsService {
    }
 
    createTeams() :void{
-     for (const teamName of TEAM_NAMES){
+     for (const teamName of TEAM_NAMES.sort()){
+      console.log(teamName)
        const newTeam = new Team(teamName)
        this.teams.push(newTeam)
      }

@@ -11,8 +11,6 @@ export class ScaleService {
   constructor(private teams: TeamsService) { }
 
   public getXScale(width : number, selectedTeam: string) : d3.ScaleLinear<number, number, never>{
-    const team = this.teams.getTeamByName(selectedTeam).seasons
-    const goals = team.map(function(d) { return Math.max(d.goalsAgainst, d.goalsScored)  }) as number[]
     return d3.scaleLinear()
      .domain([ 0, 350 ])
      .range([ 0, 0.95* width ]);
