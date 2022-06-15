@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
 import {  TEAM_NAMES, YEARS } from 'src/assets/constants';
 import { environment } from 'src/environments/environment';
+import { ChordDiagramService } from './chord-diagram.service';
 import { ScaleService } from './scale.service';
 import { TeamsService } from './teams.service';
 
@@ -24,7 +25,7 @@ export class BackToBackService {
   private color  = 'gray'
 
 
-  constructor(private http: HttpClient, private teams: TeamsService, private scale: ScaleService) { 
+  constructor(private http: HttpClient, private teams: TeamsService, private scale: ScaleService, private chordDiagram : ChordDiagramService) { 
     this.setChart()
   }
 
@@ -35,8 +36,6 @@ export class BackToBackService {
       this.buildBarChart()
     }
     setTimeout( buildBarChart, 500)
-    
-
   }
 
   private loadData() : void {
@@ -59,6 +58,7 @@ export class BackToBackService {
   
   private prepareChart(){
     this.createElements()
+    this.positionPanel()
     this.yScale =  this.scale.getYScale(height)
     this.buildYAxe()
     this.buildXAxe()
@@ -78,6 +78,7 @@ export class BackToBackService {
   }
 
   private buildYAxe(): void{
+    const callChordDiagram = (year : string) : void => this.chordDiagram.display(year, this.selectedTeam, this.width, height, this.legendHeight) 
     const svg = d3.select('.y.axis')
     .attr('width', this.yAxisWidth)
     .attr("transform", "translate(" + (this.chartWidth + this.yAxisWidth/2 + 3)  + "," + this.legendHeight + ")")
@@ -86,6 +87,16 @@ export class BackToBackService {
       .tickSizeInner(0))
       .attr('text-anchor', 'middle')
       .attr('font-size', '15px')
+      .style('cursor', 'pointer')
+      .on('mouseover',  function(d: any){
+        d3.select(d.target).attr('font-size', '20px')
+      })
+      .on('mouseout',  function(d: any){
+        d3.select(d.target).attr('font-size', '15px')
+      })
+      .on('click',  function(d: any){
+        callChordDiagram(d.srcElement.__data__)
+      })
       .select(".domain")
       .remove()
   }
@@ -147,7 +158,6 @@ export class BackToBackService {
   private appendRectangles(toSelect : string) : void{
     const team = this.teams.getTeamByName(this.selectedTeam).seasons
     const svg = d3.select(toSelect).selectAll('.bar-chart')
-    
     d3.select(toSelect).selectAll('g').remove()
     svg.selectAll('rect')
       .remove()
@@ -179,9 +189,9 @@ export class BackToBackService {
       })
       
     g.selectAll('text.' + this.selectedTeam)
-      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))!  + sizeBar/2 + this.legendHeight })
-      .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst) })
-      .attr('font-size', sizeBar)
+      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))!  + sizeBar/2 + this.legendHeight + 2 })
+      .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst) + 5 })
+      .attr('font-size', sizeBar + 1)
       .attr('fill','white')
       .attr('text-anchor', 'start')
       .style('alignment-baseline', 'middle')
@@ -194,7 +204,7 @@ export class BackToBackService {
     const sizeBar = 0.90 * this.yScale.bandwidth()
     g.selectAll('rect.' + this.selectedTeam)
       .attr('x', this.chartWidth + this.yAxisWidth)
-      .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) )))! + this.legendHeight })
+      .attr('y',  (d: { year: number; }) => { return this.yScale(((d.year + '-' + (d.year + 1) )))! + this.legendHeight  })
       .attr('width', (d: { goalsScored: d3.NumberValue; }) => { return this.xScale(d.goalsScored); })
       .attr('height', sizeBar)
       .attr('fill', color)
@@ -207,14 +217,15 @@ export class BackToBackService {
       })
     
     g.selectAll('text.' + this.selectedTeam)
-      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + sizeBar/2 + this.legendHeight })
-      .attr('x', (d: { goalsScored: number }) => { return this.chartWidth + this.yAxisWidth + this.xScale(d.goalsScored); })
+      .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + sizeBar/2 + this.legendHeight + 2 })
+      .attr('x', (d: { goalsScored: number }) => { return this.chartWidth + this.yAxisWidth + this.xScale(d.goalsScored) - 5; })
       .attr('font-size', sizeBar)
       .attr('fill','white')
       .attr('text-anchor', 'end')
       .style('alignment-baseline', 'middle')
       .text((d: { goalsScored: number }) => { return d.goalsScored})
   }
+
 
 
   private createElements() : void {
@@ -229,6 +240,18 @@ export class BackToBackService {
     g.append('g').attr('class', 'y axis')
     g.append('g').attr('class', 'leftChart')
     g.append('g').attr('class', 'rightChart')
+    svg.append('g').attr('id', 'panel')
+  }
+
+  positionPanel(){
+    d3.select('#panel')
+    .style('width', '215px')
+    .style('border', '1px solid black')
+    .style('padding', '10px')
+    .style('visibility', 'hidden')
+    .style('background-color', 'blue')
+    .attr('x', 65)
+    .attr('y', this.legendHeight/2)
   }
 
   private appendRectanglesMenu() : void{
@@ -262,6 +285,7 @@ export class BackToBackService {
       .attr('stroke', 'black')
       .attr('width', width)
       .attr('height', height * 0.9)
+      .style('cursor', 'pointer')
       .on('click',  function(d: any){
         callTeam(d.srcElement.__data__)
       })
@@ -280,6 +304,7 @@ export class BackToBackService {
       .text((d: { goalsScored: number }) => { return d})
       .attr('font-size', height *0.7)
       .attr('text-anchor', 'middle')
+      .style('cursor', 'pointer')
       .on('click',  function(d: any){
         callTeam(d.srcElement.__data__)
       })
@@ -288,6 +313,5 @@ export class BackToBackService {
   changeTeam(team: string) : void{
     this.selectedTeam = team
     this.buildBarChart()
-
   }
 }
