@@ -13,81 +13,57 @@ interface StackedChart{
   providedIn: 'root'
 })
 export class StackedBarChartService {
-	private w: number = 600;
-	private h: number = 400;
-	private margin = {top: 10, right: 50, bottom: 60, left: 100};
-	private width = this.w - this.margin.left - this.margin.right;
-	private height = this.h - this.margin.top - this.margin.bottom;
-
-
-	private data: StackedChart[];
-	
 
 	constructor(private http: HttpClient){
-		this.data = new Array<StackedChart>()
-		this.loadData()
-		this.createChart()
-	}
+		var data = [
+			{year: 2007, shots: 65294, misses: 26889, blocked: 29648, goals: 7034},
+			{year: 2008, shots: 67671, misses: 28492, blocked: 32237, goals: 7345},
+			{year: 2009, shots: 68390, misses: 29017, blocked: 33422, goals: 7245},
+			{year: 2010, shots: 68580, misses: 29108, blocked: 34902, goals: 7045},
+			{year: 2011, shots: 67223, misses: 28686, blocked: 34796, goals: 6954},
+			{year: 2012, shots: 38467, misses: 16536, blocked: 20597, goals: 4048},
+			{year: 2013, shots: 68009, misses: 29067, blocked: 34757, goals: 6986},
+			{year: 2014, shots: 67704, misses: 28776, blocked: 35598, goals: 6929},
+			{year: 2015, shots: 66979, misses: 28635, blocked: 34845, goals: 6803},
+			{year: 2016, shots: 68030, misses: 29123, blocked: 34994, goals: 6928},
+			{year: 2017, shots: 74176, misses: 31195, blocked: 37423, goals: 7691},
+			{year: 2018, shots: 72708, misses: 30392, blocked: 36261, goals: 7765},
+			{year: 2019, shots: 61843, misses: 25261, blocked: 29615, goals: 6648},
+			{year: 2020, shots: 47221, misses: 19350, blocked: 22554, goals: 5176},
+			{year: 2021, shots: 75232, misses: 30424, blocked: 35369, goals: 8374}
+		  ];
+		var colors = ['#7FFFD4', '#D2691E', '#8B0000', '#808080'];
+		var categories = ["shots", "misses", "blocked", "goals"]
 
-	// ngOnInit() {
-	// 	this.stack = d3.stack()
-	// 		.keys(['goals','shots','misses','blocked'])
-
-	// 	this.initScales();
-	// 	this.initSvg();
-	// 	// this.createStack(this.data);
-	// 	// this.drawAxis();
-	// }
-
-	private loadData(){
-		const fileDirectory = '/assets/shot_data.csv'
-		this.http.get(environment.host + fileDirectory, {responseType: 'text'})
-				.subscribe(data => this.parseData(data));
-	}
-
-	private parseData(data: string){
-		const list = data.split('\n')
-		for (const season of list.slice(1, list.length -1)){
-			let bar : StackedChart = {
-				goals: 0,
-				shots: 0,
-				misses: 0,
-				blocked: 0,
-				year: 0
-			}
-		  	const line = season.split(',')
-			bar.year = Number(line[0])
-			bar.shots = Number(line[1])
-			bar.misses = Number(line[2])
-			bar.blocked = Number(line[3])
-			bar.goals = Number(line[4])
-			this.data.push(bar)
-		}
-	}
-
-	private createChart(){
+		var stackedData = d3.stack().keys(categories)(data as any)
+		const buildBarChart = () => {
+			var margin = 50;
+    	var width = 1500;
+        var height = 700;
 		var svg = d3.select("#stackedBar")
 			.append("svg")
 			.attr('class', 'stacked-chart')
-			.attr("width", this.width)
-			.attr("height", this.height)
-			.append("g")
+			.attr("width", width)
+			.attr("height", height)
+			.append("g").attr("transform", "translate(" + (margin +60)/2 +  "," + "10)")
 
-		var xScale = d3.scaleLinear()
-			.domain(this.data.map(function(d) { return d.year; }))
-			.range([0, this.width]);
+		var domain = data.map(function(d) { return String(d.year); })
+		var xScale = d3.scaleBand().padding(1).domain(domain).range([0, width])
+
   
 		let max = 0
-		this.data.forEach(d => {
-			if (d.goals + d.misses + d.shots + d.blocked > max) {
-				max = d.goals + d.misses + d.shots + d.blocked
+		data.forEach(d => {
+			const total = d.goals + d.misses + d.shots + d.blocked
+			if (total > max) {
+				max = total
 			}
 		})
-	 	var yScale = d3.scaleLinear()
-			.domain([0, max])
-			.range([this.height, 0]);
 
-		var yAxis = d3.axisLeft(yScale)
+	 	var yScale = d3.scaleLinear()
+			.domain([0, max]).nice()
+			.range([height - margin, 0]);
+
+		var yAxis = d3.axisLeft(yScale).tickSize(-width)
   
 	  	var xAxis = d3.axisBottom(xScale)
   
@@ -97,36 +73,40 @@ export class StackedBarChartService {
   
 	 	svg.append("g")
 			.attr("class", "x axis")
-			.attr("transform", "translate(0," + this.height + ")")
+			.attr("transform", "translate(0," + (height - margin) + ")")
 			.call(xAxis);
 		svg.append('text')
-			.attr('x', this.width/2)
-			.attr('y', this.height + 30)
 			.attr('text-anchor', 'middle')
+			.attr('transform', 'translate(' + width/2 + ',' + (height - 10) + ')')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 12)
-			.text('Year');
+			.text('Saisons');
 		svg.append('text')
 			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(-30,' + this.height/2 + ')rotate(-90)')
+			.attr('transform', 'translate(-40,' + (height - margin)/2 + ')rotate(-90)')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 12)
-			.text('Shots');
+			.text('Nombre de tirs');
 
-		var colors = ['#7FFFD4', '#D2691E', '#8B0000', '#808080'];
-		// var groups = svg.selectAll("g.bars")
-		// 	.data(this.data)
-		// 	.enter().append("g")
-		// 	.attr("class", "bars")
-		// 	.style("fill", function(d, i) { return colors[i]; })
-		// 	.style("stroke", "#000");
-		// var rect = groups.selectAll("rect")
-		// 	.data(function(d) { return d; })
-		// 	.enter()
-		// 	.append("rect")
-		// 	.attr("x", function(d) { return xScale(d.x); })
-		// 	.attr("y", function(d) { return yScale(d.y0 + d.y); })
-		// 	.attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); })
+		
+		var groups = svg.selectAll("g.bars")
+			.data(stackedData)
+			.enter().append("g")
+			.attr("class", "bars")
+			.style("fill", function(d, i) { return colors[i]; })
+			.style("stroke", "#000")
+
+		groups.selectAll("rect")
+			.data(function(d) { return d; })
+			.enter()
+			.append("rect")
+			.attr('width', 40)
+			.attr("x", function(d) { return +(xScale(String(d.data['year'])) as Number); })
+			.attr("y", function(d) { return yScale(d[1]); })
+			.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
+			.attr("transform", 'translate(' + (-20) + ',0)')
+		}
+		setTimeout( buildBarChart, 500)
+		
 	}
-
 }
