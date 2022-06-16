@@ -181,11 +181,10 @@ export class BackToBackService {
       .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst); })
       .attr('fill', color)
       .on('mouseover',  function(d: any){
-        d3.select(d.target).attr('opacity', 0.5)
+        d3.select(d.target).attr('fill', '#3A3B3C').attr('height',1.3* sizeBar)
       })
       .on('mouseout',  function(d: any){
-        d3.select(d.target).attr('height',sizeBar)
-        .attr('opacity', 1)
+        d3.select(d.target).attr('height',sizeBar).attr('fill', color)
       })
       
     g.selectAll('text.' + this.selectedTeam)
@@ -209,11 +208,10 @@ export class BackToBackService {
       .attr('height', sizeBar)
       .attr('fill', color)
       .on('mouseover',  function(d: any){
-        d3.select(d.target).attr('opacity', 0.5)
+        d3.select(d.target).attr('fill', '#3A3B3C').attr('height',1.3* sizeBar)
       })
       .on('mouseout',  function(d: any){
-        d3.select(d.target).attr('height',sizeBar)
-        .attr('opacity', 1)
+        d3.select(d.target).attr('height',sizeBar).attr('fill', color)
       })
     
     g.selectAll('text.' + this.selectedTeam)
