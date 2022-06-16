@@ -1,0 +1,8 @@
+body {
+    font-family: 'Montserrat', 'sans-serif';
+    font-size: 16px;
+    background-color: #c9d7e6;
+    color: #000000;
+    display: flex;
+    justify-content: center;
+}
