@@ -8,11 +8,10 @@ import os
 
 def read_pbp(year):
     print(os.getcwd())
-    
+
     events_dir = "pbp/"
     event_template = "nhl_pbp" + str(year) + str(year + 1) + ".csv"
-    
-    df_event = pd.read_csv(events_dir+ '/' + event_template)
+    df_event = pd.read_csv(f"{events_dir}{event_template}", quotechar='|')
     return df_event
 
 
