@@ -3,12 +3,16 @@ import csv
 
 import numpy as np
 import pandas as pd
+import os
 
 
 def read_pbp(year):
+    print(os.getcwd())
+    
     events_dir = "pbp/"
     event_template = "nhl_pbp" + str(year) + str(year + 1) + ".csv"
-    df_event = pd.read_csv(f"{events_dir}{event_template}", quotechar='|')
+    
+    df_event = pd.read_csv(events_dir+ '/' + event_template)
     return df_event
 
 
@@ -161,4 +165,4 @@ def create_teams_goal_files():
         team_goals(year)
 
 
-create_teams_goal_files()
+#create_teams_goal_files()
