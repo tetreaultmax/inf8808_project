@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ElementRef, Injectable } from '@angular/core';
+import { ElementRef, HostListener, Injectable } from '@angular/core';
 import * as d3 from 'd3';
 import { environment } from 'src/environments/environment';
 interface StackedChart{
@@ -34,77 +34,99 @@ export class StackedBarChartService {
 		  ];
 		var colors = ['#7FFFD4', '#D2691E', '#8B0000', '#808080'];
 		var categories = ["shots", "misses", "blocked", "goals"]
-
+		var margin = 50;
+		var width = window.innerWidth;
+		var height = window.innerHeight;
+		var legendHeight = 100
+		var keys = ["Buts", "Tirs bloqués", "Tirs ratés", "Tirs tentés"]
 		var stackedData = d3.stack().keys(categories)(data as any)
 		const buildBarChart = () => {
-			var margin = 50;
-    	var width = 1500;
-        var height = 700;
-		var svg = d3.select("#stackedBar")
-			.append("svg")
-			.attr('class', 'stacked-chart')
-			.attr("width", width)
-			.attr("height", height)
-			.append("g").attr("transform", "translate(" + (margin +60)/2 +  "," + "10)")
+			var svg = d3.select("#stackedBar")
+				.append("svg")
+				.attr('class', 'stacked-chart')
+				.attr("width", width)
+				.attr("height", height)
+				.append("g")
+				.attr("width", width/2)
+				.attr("height", height/2)
+				.attr("transform", 'translate(' + margin + ',' + margin + ')')
+				
+			svg.selectAll("mydots")
+				.data(keys)
+				.enter()
+				.append("circle")
+				  .attr("cx", 0)
+				  .attr("cy", function(d,i){ return i*25})
+				  .attr("r", 7)
+				  .style("fill", function(d, i){ return colors[3 - i]})
+				  .attr("transform", 'translate(' + (width/2 + 10) + ',0)')
+			svg.selectAll("mylabels")
+				.data(keys)
+				.enter()
+				.append("text")
+				.attr("y", function(d,i){ return i*25})
+				.text(function(d){ return d})
+				.attr("text-anchor", "left")
+				.style("alignment-baseline", "middle")
+				.attr("transform", 'translate(' + (width/2 + 20) + ',0)')
+				
+			var domain = data.map(function(d) { return String(d.year); })
+			var xScale = d3.scaleBand().padding(1).domain(domain).range([0, width/2])
 
-		var domain = data.map(function(d) { return String(d.year); })
-		var xScale = d3.scaleBand().padding(1).domain(domain).range([0, width])
+			let max = 0
+			data.forEach(d => {
+				const total = d.goals + d.misses + d.shots + d.blocked
+				if (total > max) {
+					max = total
+				}
+			})
 
-  
-		let max = 0
-		data.forEach(d => {
-			const total = d.goals + d.misses + d.shots + d.blocked
-			if (total > max) {
-				max = total
-			}
-		})
+			var yScale = d3.scaleLinear()
+				.domain([0, max]).nice()
+				.range([height/2 - margin, 0]);
 
-	 	var yScale = d3.scaleLinear()
-			.domain([0, max]).nice()
-			.range([height - margin, 0]);
+			var yAxis = d3.axisLeft(yScale).tickSize(-width/2)
+	
+			var xAxis = d3.axisBottom(xScale)
+	
+			svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis);
+	
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + (height/2 - margin) + ")")
+				.call(xAxis);
+			svg.append('text')
+				.attr('text-anchor', 'middle')
+				.attr('transform', 'translate(' + width/4 + ',' + (height/2 - 10) + ')')
+				.style('font-family', 'Helvetica')
+				.style('font-size', 12)
+				.text('Saisons');
+			svg.append('text')
+				.attr('text-anchor', 'middle')
+				.attr('transform', 'translate(-40,' + (height/2 - margin)/2 + ')rotate(-90)')
+				.style('font-family', 'Helvetica')
+				.style('font-size', 12)
+				.text('Nombre de tirs');
 
-		var yAxis = d3.axisLeft(yScale).tickSize(-width)
-  
-	  	var xAxis = d3.axisBottom(xScale)
-  
-	  	svg.append("g")
-			.attr("class", "y axis")
-			.call(yAxis);
-  
-	 	svg.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + (height - margin) + ")")
-			.call(xAxis);
-		svg.append('text')
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(' + width/2 + ',' + (height - 10) + ')')
-			.style('font-family', 'Helvetica')
-			.style('font-size', 12)
-			.text('Saisons');
-		svg.append('text')
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(-40,' + (height - margin)/2 + ')rotate(-90)')
-			.style('font-family', 'Helvetica')
-			.style('font-size', 12)
-			.text('Nombre de tirs');
+			
+			var groups = svg.selectAll("g.bars")
+				.data(stackedData)
+				.enter().append("g")
+				.attr("class", "bars")
+				.style("fill", function(d, i) { return colors[i]; })
+				.style("stroke", "#000")
 
-		
-		var groups = svg.selectAll("g.bars")
-			.data(stackedData)
-			.enter().append("g")
-			.attr("class", "bars")
-			.style("fill", function(d, i) { return colors[i]; })
-			.style("stroke", "#000")
-
-		groups.selectAll("rect")
-			.data(function(d) { return d; })
-			.enter()
-			.append("rect")
-			.attr('width', 40)
-			.attr("x", function(d) { return +(xScale(String(d.data['year'])) as Number); })
-			.attr("y", function(d) { return yScale(d[1]); })
-			.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
-			.attr("transform", 'translate(' + (-20) + ',0)')
+			groups.selectAll("rect")
+				.data(function(d) { return d; })
+				.enter()
+				.append("rect")
+				.attr('width', 40)
+				.attr("x", function(d) { return +(xScale(String(d.data['year'])) as Number); })
+				.attr("y", function(d) { return yScale(d[1]); })
+				.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
+				.attr("transform", 'translate(' + (-20) + ',0)')
 		}
 		setTimeout( buildBarChart, 500)
 		
