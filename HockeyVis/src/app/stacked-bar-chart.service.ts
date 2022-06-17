@@ -35,6 +35,8 @@ export class StackedBarChartService {
 		var colors = ['#7FFFD4', '#D2691E', '#8B0000', '#808080'];
 		var categories = ["shots", "misses", "blocked", "goals"]
 		var margin = 50;
+		var marginTop = 50
+		var marginSide = 100
 		var width = window.innerWidth;
 		var height = window.innerHeight;
 		var widthChart = 0.7 * width
@@ -53,7 +55,7 @@ export class StackedBarChartService {
 				.append("g")
 				.attr("width", widthChart)
 				.attr("height",heightChart)
-				.attr("transform", 'translate(' + margin + ',' + margin + ')')
+				.attr("transform", 'translate(' + marginSide + ',' + marginTop + ')')
 				
 			svg.selectAll("mydots")
 				.data(keys)
@@ -95,32 +97,34 @@ export class StackedBarChartService {
 	
 			svg.append("g")
 				.attr("class", "y axis")
+				.style('font-family', 'Helvetica')
+				.style('font-size', 16)
 				.call(yAxis);
 	
 			svg.append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + (heightChart - margin) + ")")
+				.style('font-family', 'Helvetica')
+				.style('font-size', 16)
 				.call(xAxis);
 			svg.append('text')
 				.attr('text-anchor', 'middle')
 				.attr('transform', 'translate(' + widthChart/2 + ',' + (heightChart - 10) + ')')
 				.style('font-family', 'Helvetica')
-				.style('font-size', 12)
+				.style('font-size', 16)
 				.text('Saisons');
 			svg.append('text')
 				.attr('text-anchor', 'middle')
-				.attr('transform', 'translate(-40,' + (heightChart - margin)/2 + ')rotate(-90)')
+				.attr('transform', 'translate(' + -1.5 * marginTop + ',' + (heightChart - margin)/2 + ')rotate(-90)')
 				.style('font-family', 'Helvetica')
-				.style('font-size', 12)
+				.style('font-size', 16)
 				.text('Nombre de tirs');
 
-			
 			var groups = svg.selectAll("g.bars")
 				.data(stackedData)
 				.enter().append("g")
 				.attr("class", "bars")
 				.style("fill", function(d, i) { return colors[i]; })
-				.style("stroke", "#000")
 
 			groups.selectAll("rect")
 				.data(function(d) { return d; })
@@ -129,8 +133,7 @@ export class StackedBarChartService {
 				.attr('width', 40)
 				.attr("x", function(d) { return +(xScale(String(d.data['year'])) as Number); })
 				.attr("y", function(d) { return yScale(d[1]); })
-				.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
-				.attr("transform", 'translate(' + (-20) + ',0)')
+				.attr("height", function(d) { console.log(d[1]);return yScale(d[0]) - yScale(d[1]); })
 		}
 		setTimeout( buildBarChart, 500)
 		

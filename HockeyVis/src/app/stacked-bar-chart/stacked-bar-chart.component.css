@@ -1,6 +1,6 @@
-svg {
-    font-family: 'Montserrat', 'sans-serif';
-    font-size: 16px;
+body {
+    font-family: 'Helvetica';
+    font-size: 16;
     background-color: #c9d7e6;
     color: #000000;
 }
