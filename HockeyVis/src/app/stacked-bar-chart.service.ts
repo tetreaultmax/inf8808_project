@@ -14,7 +14,7 @@ interface StackedChart{
 })
 export class StackedBarChartService {
 
-	constructor(private http: HttpClient){
+	constructor(){
 		var data = [
 			{year: 2007, shots: 65294, misses: 26889, blocked: 29648, goals: 7034},
 			{year: 2008, shots: 67671, misses: 28492, blocked: 32237, goals: 7345},
@@ -37,7 +37,11 @@ export class StackedBarChartService {
 		var margin = 50;
 		var width = window.innerWidth;
 		var height = window.innerHeight;
-		var legendHeight = 100
+		var widthChart = 0.7 * width
+		var heightChart = 0.7 * height
+		var placeLegend = widthChart + 10
+		var spaceLegend = 25
+		var radius = 8
 		var keys = ["Buts", "Tirs bloqués", "Tirs ratés", "Tirs tentés"]
 		var stackedData = d3.stack().keys(categories)(data as any)
 		const buildBarChart = () => {
@@ -47,31 +51,31 @@ export class StackedBarChartService {
 				.attr("width", width)
 				.attr("height", height)
 				.append("g")
-				.attr("width", width/2)
-				.attr("height", height/2)
+				.attr("width", widthChart)
+				.attr("height",heightChart)
 				.attr("transform", 'translate(' + margin + ',' + margin + ')')
 				
 			svg.selectAll("mydots")
 				.data(keys)
 				.enter()
 				.append("circle")
-				  .attr("cx", 0)
-				  .attr("cy", function(d,i){ return i*25})
-				  .attr("r", 7)
-				  .style("fill", function(d, i){ return colors[3 - i]})
-				  .attr("transform", 'translate(' + (width/2 + 10) + ',0)')
+				.attr("cx", 0)
+				.attr("cy", function(d,i){ return i*spaceLegend})
+				.attr("r", radius)
+				.style("fill", function(d, i){ return colors[colors.length - 1 - i]})
+				.attr("transform", 'translate(' + (placeLegend) + ',0)')
 			svg.selectAll("mylabels")
 				.data(keys)
 				.enter()
 				.append("text")
-				.attr("y", function(d,i){ return i*25})
+				.attr("y", function(d,i){ return i*spaceLegend})
 				.text(function(d){ return d})
 				.attr("text-anchor", "left")
 				.style("alignment-baseline", "middle")
-				.attr("transform", 'translate(' + (width/2 + 20) + ',0)')
+				.attr("transform", 'translate(' + (placeLegend + 10) + ',0)')
 				
 			var domain = data.map(function(d) { return String(d.year); })
-			var xScale = d3.scaleBand().padding(1).domain(domain).range([0, width/2])
+			var xScale = d3.scaleBand().padding(1).domain(domain).range([0, widthChart])
 
 			let max = 0
 			data.forEach(d => {
@@ -83,9 +87,9 @@ export class StackedBarChartService {
 
 			var yScale = d3.scaleLinear()
 				.domain([0, max]).nice()
-				.range([height/2 - margin, 0]);
+				.range([heightChart - margin, 0]);
 
-			var yAxis = d3.axisLeft(yScale).tickSize(-width/2)
+			var yAxis = d3.axisLeft(yScale).tickSize(-widthChart)
 	
 			var xAxis = d3.axisBottom(xScale)
 	
@@ -95,17 +99,17 @@ export class StackedBarChartService {
 	
 			svg.append("g")
 				.attr("class", "x axis")
-				.attr("transform", "translate(0," + (height/2 - margin) + ")")
+				.attr("transform", "translate(0," + (heightChart - margin) + ")")
 				.call(xAxis);
 			svg.append('text')
 				.attr('text-anchor', 'middle')
-				.attr('transform', 'translate(' + width/4 + ',' + (height/2 - 10) + ')')
+				.attr('transform', 'translate(' + widthChart/2 + ',' + (heightChart - 10) + ')')
 				.style('font-family', 'Helvetica')
 				.style('font-size', 12)
 				.text('Saisons');
 			svg.append('text')
 				.attr('text-anchor', 'middle')
-				.attr('transform', 'translate(-40,' + (height/2 - margin)/2 + ')rotate(-90)')
+				.attr('transform', 'translate(-40,' + (heightChart - margin)/2 + ')rotate(-90)')
 				.style('font-family', 'Helvetica')
 				.style('font-size', 12)
 				.text('Nombre de tirs');
