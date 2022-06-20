@@ -146,8 +146,6 @@ export class StackedBarChartService {
 				.on('mouseover', (event, d) => {
 					tooltip.transition().duration(200).style('opacity', 0.9);
 					tooltip.html(`Fréquence de tirs: <span>${d[1] - d[0]}</span>`)
-					.style('left', `${event.layerX}px`)
-      				.style('top', `${(event.layerY - 28)}px`);
 				  })
 				.on('mouseout', () => tooltip.transition().duration(500).style('opacity', 0));
 			
