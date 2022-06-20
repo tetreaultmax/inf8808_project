@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { ElementRef, HostListener, Injectable } from '@angular/core';
 import * as d3 from 'd3';
 import { environment } from 'src/environments/environment';
+
+
 interface StackedChart{
 	goals: number,
 	shots: number,
@@ -38,7 +40,7 @@ export class StackedBarChartService {
 		var marginTop = 50
 		var marginSide = 100
 		var width = window.innerWidth;
-		var height = window.innerHeight;
+		var height = 0.7* window.innerHeight;
 		var widthChart = 0.7 * width
 		var heightChart = 0.7 * height
 		var placeLegend = widthChart + 10
@@ -46,6 +48,10 @@ export class StackedBarChartService {
 		var radius = 8
 		var keys = ["Buts", "Tirs bloqués", "Tirs ratés", "Tirs tentés"]
 		var stackedData = d3.stack().keys(categories)(data as any)
+		const tooltip = d3.select('body').append('div')
+				.attr('class', 'tooltip')
+				.attr("transform", 'translate(' + (placeLegend + 10) + ',0)')
+				.style('opacity', 0);
 		const buildBarChart = () => {
 			var svg = d3.select("#stackedBar")
 				.append("svg")
@@ -125,6 +131,8 @@ export class StackedBarChartService {
 				.enter().append("g")
 				.attr("class", "bars")
 				.style("fill", function(d, i) { return colors[i]; })
+				
+			
 
 			groups.selectAll("rect")
 				.data(function(d) { return d; })
@@ -133,7 +141,18 @@ export class StackedBarChartService {
 				.attr('width', 40)
 				.attr("x", function(d) { return +(xScale(String(d.data['year'])) as Number); })
 				.attr("y", function(d) { return yScale(d[1]); })
-				.attr("height", function(d) { console.log(d[1]);return yScale(d[0]) - yScale(d[1]); })
+				.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
+				.attr("transform", 'translate(' + (-20) + ',0)')
+				.on('mouseover', (event, d) => {
+					tooltip.transition().duration(200).style('opacity', 0.9);
+					tooltip.html(`Fréquence de tirs: <span>${d[1] - d[0]}</span>`)
+					.style('left', `${event.layerX}px`)
+      				.style('top', `${(event.layerY - 28)}px`);
+				  })
+				.on('mouseout', () => tooltip.transition().duration(500).style('opacity', 0));
+			
+
+			
 		}
 		setTimeout( buildBarChart, 500)
 		
