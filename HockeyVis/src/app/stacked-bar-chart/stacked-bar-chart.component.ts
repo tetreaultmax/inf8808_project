@@ -8,10 +8,10 @@ import { StackedBarChartService } from '../stacked-bar-chart.service';
 })
 export class StackedBarChartComponent implements OnInit {
 
-	constructor(private stackedBarService : StackedBarChartService) { 
+	constructor(private stackedBarService : StackedBarChartService) {
 	}
 
   ngOnInit() {
   }
-  
+
 }

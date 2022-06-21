@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { BackToBackChartComponent } from './back-to-back-chart/back-to-back-chart.component';
 import { HttpClientModule } from '@angular/common/http';
 import { StackedBarChartComponent } from './stacked-bar-chart/stacked-bar-chart.component';
+import { UnivariateScatterPlotComponent } from './univariate-scatter-plot/univariate-scatter-plot.component';
 
 @NgModule({
   declarations: [	
     AppComponent,
     BackToBackChartComponent,
-      StackedBarChartComponent
+      StackedBarChartComponent,
+      UnivariateScatterPlotComponent
    ],
   imports: [
     BrowserModule,
