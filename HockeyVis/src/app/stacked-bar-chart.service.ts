@@ -39,19 +39,15 @@ export class StackedBarChartService {
 		var margin = 50;
 		var marginTop = 50
 		var marginSide = 100
-		var width = window.innerWidth;
-		var height = 0.7* window.innerHeight;
+		var width = 0.9 * window.innerWidth;
+		var height = 0.8* window.innerHeight;
 		var widthChart = 0.7 * width
-		var heightChart = 0.7 * height
+		var heightChart = 0.9 * height
 		var placeLegend = widthChart + 10
-		var spaceLegend = 25
-		var radius = 8
+		var spaceLegend = 50
+		var radius = 10
 		var keys = ["Buts", "Tirs bloqués", "Tirs ratés", "Tirs tentés"]
 		var stackedData = d3.stack().keys(categories)(data as any)
-		const tooltip = d3.select('body').append('div')
-				.attr('class', 'tooltip')
-				.attr("transform", 'translate(' + (placeLegend + 10) + ',0)')
-				.style('opacity', 0);
 		const buildBarChart = () => {
 			var svg = d3.select("#stackedBar")
 				.append("svg")
@@ -61,7 +57,7 @@ export class StackedBarChartService {
 				.append("g")
 				.attr("width", widthChart)
 				.attr("height",heightChart)
-				.attr("transform", 'translate(' + marginSide + ',' + marginTop + ')')
+				.attr("transform", 'translate(' + 1.2*marginSide + ',' + marginTop + ')')
 				
 			svg.selectAll("mydots")
 				.data(keys)
@@ -80,6 +76,8 @@ export class StackedBarChartService {
 				.text(function(d){ return d})
 				.attr("text-anchor", "left")
 				.style("alignment-baseline", "middle")
+				.style('font-family', 'Helvetica')
+				.style('font-size', 20)
 				.attr("transform", 'translate(' + (placeLegend + 10) + ',0)')
 				
 			var domain = data.map(function(d) { return String(d.year); })
@@ -104,27 +102,32 @@ export class StackedBarChartService {
 			svg.append("g")
 				.attr("class", "y axis")
 				.style('font-family', 'Helvetica')
-				.style('font-size', 16)
+				.style('font-size', 20)
 				.call(yAxis);
 	
 			svg.append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + (heightChart - margin) + ")")
 				.style('font-family', 'Helvetica')
-				.style('font-size', 16)
+				.style('font-size', 20)
 				.call(xAxis);
 			svg.append('text')
 				.attr('text-anchor', 'middle')
-				.attr('transform', 'translate(' + widthChart/2 + ',' + (heightChart - 10) + ')')
+				.attr('transform', 'translate(' + widthChart/2 + ',' + (heightChart) + ')')
 				.style('font-family', 'Helvetica')
-				.style('font-size', 16)
+				.style('font-size', 20)
 				.text('Saisons');
 			svg.append('text')
 				.attr('text-anchor', 'middle')
-				.attr('transform', 'translate(' + -1.5 * marginTop + ',' + (heightChart - margin)/2 + ')rotate(-90)')
+				.attr('transform', 'translate(' + -2 * marginTop + ',' + (heightChart - margin)/2 + ')rotate(-90)')
 				.style('font-family', 'Helvetica')
-				.style('font-size', 16)
+				.style('font-size', 20)
 				.text('Nombre de tirs');
+			svg.append('text')
+				.attr("transform", 'translate(' + (placeLegend) + ',200)')
+				.style('font-family', 'Helvetica')
+				.style('font-size', 20)
+				.attr('id', 'tooltip')
 
 			var groups = svg.selectAll("g.bars")
 				.data(stackedData)
@@ -144,13 +147,10 @@ export class StackedBarChartService {
 				.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
 				.attr("transform", 'translate(' + (-20) + ',0)')
 				.on('mouseover', (event, d) => {
-					tooltip.transition().duration(200).style('opacity', 0.9);
-					tooltip.html(`Fréquence de tirs: <span>${d[1] - d[0]}</span>`)
+					d3.select('#tooltip').text(`Fréquence de tirs: ${d[1] - d[0]}`).style('opacity', 1).style('font-family', 'Helvetica')
+					.style('font-size', 20)
 				  })
-				.on('mouseout', () => tooltip.transition().duration(500).style('opacity', 0));
-			
-
-			
+				.on('mouseout', () => d3.select('#tooltip').style('opacity', 0));		
 		}
 		setTimeout( buildBarChart, 500)
 		
