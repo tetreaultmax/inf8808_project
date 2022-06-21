@@ -19,7 +19,7 @@ export class StackedBarChartComponent implements OnInit {
 			new_data.push({year, shots, misses, blocked, goals})
 		})
 
-		var colors = ['#7FFFD4', '#D2691E', '#8B0000', '#808080'];
+		var colors = ['#2b8cbe', '#7bccc4', '#bae4bc','#f0f9e8'];
 		var categories = ["shots", "misses", "blocked", "goals"]
 		var margin = 50;
 		var marginTop = 50
