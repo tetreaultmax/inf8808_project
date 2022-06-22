@@ -11,10 +11,17 @@ export class SlopeChartComponent implements OnInit {
 
   constructor() { }
   ngOnInit() {
-	const path = "/assets/stats/all_stats.csv"
+	const path = "/assets/stats/all_stats_players.csv"
 	d3.csv(path).then(data =>{
-		console.log(data)
-		
+		const X = data.map(d => {
+			return d['year']
+		})
+		const Y = data.map(d => {
+			return Number(d['points'])
+		})
+		const Z = data.map(d => {
+			return d['player']
+		})
 	})
   }
 }
