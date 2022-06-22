@@ -72,14 +72,23 @@ export class SlopeChartComponent implements OnInit {
 						yScale(Number(playerData['points']))]) 				
 				})
 				var pos = 0
-				for (var j = 0; j < 10; j++){
+				for (var j = 0; j < 10; j++){
 					if (names[j] == i){
 						pos = j
 					}
 				}
-				const lineGroup = svg.append('g').append('path').attr('id', 'line_' + String(i)).style('fill', 'none').style('stroke', color[pos]).style('stroke-width', '2px')
-				const line = d3.line().x(year => year[0]).y(year => year[1])
-				lineGroup.attr('d', line(points))
+				var id_line = 'line_' + String(pos)
+				var exist = document.getElementById(id_line)
+				console.log(id_line)
+				if (exist == null){
+					const lineGroup = svg.append('g').append('path').attr('id', 'line_' + String(pos)).style('fill', 'none').style('stroke', color[pos]).style('stroke-width', '2px')
+					const line = d3.line().x(year => year[0]).y(year => year[1])
+					lineGroup.attr('d', line(points))
+				}
+				else{
+					svg.selectAll('#line_' + String(pos)).remove()
+				}
+				
 			})
 
 		svg.selectAll("mylabels")
