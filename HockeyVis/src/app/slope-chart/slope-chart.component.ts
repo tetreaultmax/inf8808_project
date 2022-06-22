@@ -48,6 +48,11 @@ export class SlopeChartComponent implements OnInit {
 			.attr("width", widthChart)
 			.attr("height",heightChart)
 			.attr("transform", 'translate(' + 1.2*marginSide + ',' + marginTop + ')')
+		svg.append('text')
+			.attr("transform", 'translate(' + (placeLegend) + ',0)')
+			.style('font-family', 'Helvetica')
+			.style('font-size', 20)
+			.text('Veuillez cliquer sur une bulle pour interagir: ');
 		svg.selectAll("mydots")
 			.data(Array.from(new d3.InternSet(Z)))
 			.enter()
@@ -56,7 +61,7 @@ export class SlopeChartComponent implements OnInit {
 			.attr("cy", function(d,i){ return i*spaceLegend})
 			.attr("r", radius)
 			.style("fill", function(d, i){ return color[color.length - 1 - i]})
-			.attr("transform", 'translate(' + (placeLegend) + ',0)')
+			.attr("transform", 'translate(' + (placeLegend) + ',30)')
 			.on('click', function(d, i){
 				const names = Array.from(new d3.InternSet(Z))
 				let arr_player: d3.DSVRowString<string>[] = []
@@ -79,14 +84,13 @@ export class SlopeChartComponent implements OnInit {
 				}
 				var id_line = 'line_' + String(pos)
 				var exist = document.getElementById(id_line)
-				console.log(id_line)
 				if (exist == null){
-					const lineGroup = svg.append('g').append('path').attr('id', 'line_' + String(pos)).style('fill', 'none').style('stroke', color[pos]).style('stroke-width', '2px')
+					const lineGroup = svg.append('g').append('path').attr('id', id_line).style('fill', 'none').style('stroke', color[pos]).style('stroke-width', '2px')
 					const line = d3.line().x(year => year[0]).y(year => year[1])
 					lineGroup.attr('d', line(points))
 				}
 				else{
-					svg.selectAll('#line_' + String(pos)).remove()
+					svg.selectAll('#' + id_line).remove()
 				}
 				
 			})
@@ -101,7 +105,7 @@ export class SlopeChartComponent implements OnInit {
 			.style("alignment-baseline", "middle")
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
-			.attr("transform", 'translate(' + (placeLegend + 10) + ',0)')
+			.attr("transform", 'translate(' + (placeLegend + 10) + ',30)')
 		const yScale = d3.scaleLinear().domain([0, max]).range([heightChart - margin, 0])
 		const xDomain = d3.sort(Array.from(new d3.InternSet(X)))
 		const xScale = d3.scaleBand().domain(xDomain).range([0, widthChart])
