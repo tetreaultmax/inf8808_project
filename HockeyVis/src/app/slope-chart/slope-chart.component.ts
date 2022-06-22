@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
+import { YEARS } from 'src/assets/constants';
 
 @Component({
   selector: 'app-slope-chart',
@@ -13,6 +14,7 @@ export class SlopeChartComponent implements OnInit {
 	const path = "/assets/stats/all_stats.csv"
 	d3.csv(path).then(data =>{
 		console.log(data)
+		
 	})
   }
 }

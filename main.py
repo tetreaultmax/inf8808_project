@@ -177,21 +177,18 @@ def points_leaders():
     all_name = set(np.array(all_name).ravel())
     all_stat = []
     for name in all_name:
-        pos = 1
-        player_stat = [name, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for year in years:
+            player_stat = [name, year, 0]
             df = read_point(year)
             for i in range(10):
                 if name == df['Name'][i]:
-                    player_stat[pos] = df['P'][i]
+                    player_stat[2] = df['P'][i]
                     break
-            pos += 1
-        all_stat.append(player_stat)
+            all_stat.append(player_stat)
 
-    header = ['player', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016',
-              '2017', '2018', '2019', '2020', '2021']
+    header = ['player', 'year', 'points']
     df = pd.DataFrame(all_stat, columns=header)
-    df.to_csv("stats/all_stats_.csv", index=False)
+    df.to_csv("stats/all_stats_players_.csv", index=False)
 
 
 # create_teams_goal_files()
