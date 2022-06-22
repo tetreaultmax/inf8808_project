@@ -3,12 +3,9 @@ import csv
 
 import numpy as np
 import pandas as pd
-import os
 
 
 def read_pbp(year):
-    print(os.getcwd())
-
     events_dir = "pbp/"
     event_template = "nhl_pbp" + str(year) + str(year + 1) + ".csv"
     df_event = pd.read_csv(f"{events_dir}{event_template}", quotechar='|')
@@ -24,6 +21,12 @@ def read_shifts(year):
 
 def read_shot():
     event_template = "shot_data.csv"
+    df_event = pd.read_csv(f"{event_template}", quotechar='|')
+    return df_event
+
+
+def read_point(year):
+    event_template = "stats/stats_" + str(year) + ".csv"
     df_event = pd.read_csv(f"{event_template}", quotechar='|')
     return df_event
 
@@ -164,4 +167,45 @@ def create_teams_goal_files():
         team_goals(year)
 
 
-#create_teams_goal_files()
+def points_leaders():
+    years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+    all_name = []
+    for year in years:
+        df = read_point(year)
+        names = df['Name'][:10]
+        all_name.append(names)
+    all_name = set(np.array(all_name).ravel())
+    all_stat = []
+    for name in all_name:
+        for year in years:
+            player_stat = [name, year, 0]
+            df = read_point(year)
+            for i in range(10):
+                if name == df['Name'][i]:
+                    player_stat[2] = df['P'][i]
+                    break
+            all_stat.append(player_stat)
+
+    header = ['player', 'year', 'points']
+    df = pd.DataFrame(all_stat, columns=header)
+    df.to_csv("stats/all_stats_players_.csv", index=False)
+
+
+def top_players():
+    years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+    all_stats = []
+    event_template = "stats/top_players.csv"
+    df = pd.read_csv(f"{event_template}", quotechar='|')
+    names = df['player']
+    pos = 0
+    for name in names:
+        for year in years:
+            all_stats.append([name, year, df[str(year)][pos]])
+        pos += 1
+    header = ['player', 'year', 'points']
+    df = pd.DataFrame(all_stats, columns=header)
+    df.to_csv("stats/top_players_year.csv", index=False)
+
+
+# create_teams_goal_files()
+top_players()
