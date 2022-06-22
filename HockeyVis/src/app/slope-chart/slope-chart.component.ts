@@ -85,7 +85,7 @@ export class SlopeChartComponent implements OnInit {
 				var id_line = 'line_' + String(pos)
 				var exist = document.getElementById(id_line)
 				if (exist == null){
-					const lineGroup = svg.append('g').append('path').attr('id', id_line).style('fill', 'none').style('stroke', color[pos]).style('stroke-width', '2px')
+					const lineGroup = svg.append('g').append('path').attr('id', id_line).style('fill', 'none').style('stroke', color[color.length - 1 - pos]).style('stroke-width', '2px')
 					const line = d3.line().x(year => year[0]).y(year => year[1])
 					lineGroup.attr('d', line(points))
 				}
@@ -140,30 +140,7 @@ export class SlopeChartComponent implements OnInit {
 			.attr('transform', 'translate(' + widthChart/2 + ',' + -20 + ')')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 24)
-			.text("Évolution du nombre de points des meilleurs pointeurs de l'histoire encore actif");
-		
-		
-		// const allPlayers = Array.from(new d3.InternSet(Z))
-		// let all_stats: any[] = []
-		// allPlayers.forEach((player, i) => {
-		// 	let arr_player: d3.DSVRowString<string>[] = []
-		// 	data.forEach(d => {
-		// 		if (d['player'] == player){
-		// 			arr_player.push(d)
-		// 		}
-		// 	})
-		// 	all_stats.push(arr_player)
-		// })
-		// all_stats.forEach((d, i) => {
-		// 	const lineGroup = svg.append('g').append('path').attr('id', 'line' + String(i)).style('fill', 'none').style('stroke', color[color.length - 1 - i]).style('stroke-width', '2px')
-		// 	const line = d3.line().x(year => year[0]).y(year => year[1])
-		// 	const points: [number, number][] = d.map((point: { [x: string]: any; }) => [
-		// 			Number(xScale(String(point['year']))),
-		// 			yScale(Number(point['points']))]
-		// 	)
-		// 	lineGroup.attr('d', line(points))
-		// })
-		
+			.text("Évolution du nombre de points des meilleurs pointeurs de l'histoire encore actif");	
 	})
   }
 }
