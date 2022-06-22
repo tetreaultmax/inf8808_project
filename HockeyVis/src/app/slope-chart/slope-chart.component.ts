@@ -87,13 +87,20 @@ export class SlopeChartComponent implements OnInit {
 			.attr('transform', 'translate(' + widthChart/2 + ',' + (heightChart) + ')')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
-			.text('Nombres de points');
+			.text('Saisons');
 		svg.append('text')
 			.attr('text-anchor', 'middle')
 			.attr('transform', 'translate(' + -2 * marginTop + ',' + (heightChart - margin)/2 + ')rotate(-90)')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
-			.text('Saisons');
+			.text('Nombres de points');
+		svg.append('text')
+			.attr('text-anchor', 'middle')
+			.attr('transform', 'translate(' + widthChart/2 + ',' + -20 + ')')
+			.style('font-family', 'Helvetica')
+			.style('font-size', 24)
+			.text("Évolution du nombre de points des meilleurs pointeurs de l'histoire encore actif");
+		
 		
 		const allPlayers = Array.from(new d3.InternSet(Z))
 		let all_stats: any[] = []
