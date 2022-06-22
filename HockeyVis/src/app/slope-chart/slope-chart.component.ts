@@ -32,6 +32,9 @@ export class SlopeChartComponent implements OnInit {
 		var height = 0.8* window.innerHeight;
 		var widthChart = 0.7 * width
 		var heightChart = 0.9 * height
+		var placeLegend = widthChart + 10
+		var spaceLegend = 50
+		var radius = 10
 		var svg = d3.select("#lineChart")
 			.append("svg")
 			.attr('class', '.lineChart')
@@ -41,7 +44,26 @@ export class SlopeChartComponent implements OnInit {
 			.attr("width", widthChart)
 			.attr("height",heightChart)
 			.attr("transform", 'translate(' + 1.2*marginSide + ',' + marginTop + ')')
-
+		svg.selectAll("mydots")
+			.data(Array.from(new d3.InternSet(Z)))
+			.enter()
+			.append("circle")
+			.attr("cx", 0)
+			.attr("cy", function(d,i){ return i*spaceLegend})
+			.attr("r", radius)
+			.style("fill", 'red')
+			.attr("transform", 'translate(' + (placeLegend) + ',0)')
+		svg.selectAll("mylabels")
+			.data(Array.from(new d3.InternSet(Z)))
+			.enter()
+			.append("text")
+			.attr("y", function(d,i){ return i*spaceLegend})
+			.text(function(d){ return d})
+			.attr("text-anchor", "left")
+			.style("alignment-baseline", "middle")
+			.style('font-family', 'Helvetica')
+			.style('font-size', 20)
+			.attr("transform", 'translate(' + (placeLegend + 10) + ',0)')
 		const yScale = d3.scaleLinear().domain([0, max]).range([heightChart - margin, 0])
 		const xDomain = d3.sort(Array.from(new d3.InternSet(X)))
 		const xScale = d3.scaleBand().domain(xDomain).range([0, widthChart])
