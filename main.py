@@ -197,14 +197,14 @@ def top_players():
     event_template = "stats/top_players.csv"
     df = pd.read_csv(f"{event_template}", quotechar='|')
     names = df['player']
+    pos = 0
     for name in names:
-        pos = 0
         for year in years:
             all_stats.append([name, year, df[str(year)][pos]])
         pos += 1
     header = ['player', 'year', 'points']
     df = pd.DataFrame(all_stats, columns=header)
-    df.to_csv("stats/top_players_year_.csv", index=False)
+    df.to_csv("stats/top_players_year.csv", index=False)
 
 
 # create_teams_goal_files()

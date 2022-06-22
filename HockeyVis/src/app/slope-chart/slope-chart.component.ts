@@ -25,6 +25,7 @@ export class SlopeChartComponent implements OnInit {
 		const Z = data.map(d => {
 			return String(d['player'])
 		})
+		var color = ['#67001f','#b2182b','#d6604d','#f4a582','#fddbc7','#d1e5f0','#92c5de','#4393c3','#2166ac','#053061']
 		var margin = 50;
 		var marginTop = 50
 		var marginSide = 100
@@ -51,7 +52,7 @@ export class SlopeChartComponent implements OnInit {
 			.attr("cx", 0)
 			.attr("cy", function(d,i){ return i*spaceLegend})
 			.attr("r", radius)
-			.style("fill", 'red')
+			.style("fill", function(d, i){ return color[color.length - 1 - i]})
 			.attr("transform", 'translate(' + (placeLegend) + ',0)')
 		svg.selectAll("mylabels")
 			.data(Array.from(new d3.InternSet(Z)))
@@ -93,13 +94,28 @@ export class SlopeChartComponent implements OnInit {
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.text('Saisons');
-		const lineGroup = svg.append('g').append('path').attr('id', 'line').style('fill', 'none').style('stroke', 'red').style('stroke-width', '2px')
-		const line = d3.line().x(d => d[0]).y(d => d[1])
-		const points: [number, number][] = data.map(d => [
-			Number(xScale(String(d['year']))),
-			yScale(Number(d['points'])),
-		])
-		lineGroup.attr('d', line(points))
+		
+		const allPlayers = Array.from(new d3.InternSet(Z))
+		let all_stats: any[] = []
+		allPlayers.forEach((player, i) => {
+			let arr_player: d3.DSVRowString<string>[] = []
+			data.forEach(d => {
+				if (d['player'] == player){
+					arr_player.push(d)
+				}
+			})
+			all_stats.push(arr_player)
+		})
+		all_stats.forEach((d, i) => {
+			const lineGroup = svg.append('g').append('path').attr('id', 'line' + String(i)).style('fill', 'none').style('stroke', color[color.length - 1 - i]).style('stroke-width', '2px')
+			const line = d3.line().x(year => year[0]).y(year => year[1])
+			const points: [number, number][] = d.map((point: { [x: string]: any; }) => [
+					Number(xScale(String(point['year']))),
+					yScale(Number(point['points']))]
+			)
+			lineGroup.attr('d', line(points))
+		})
+		
 	})
   }
 }
