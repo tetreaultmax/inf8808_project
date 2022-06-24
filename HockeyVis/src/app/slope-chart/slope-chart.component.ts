@@ -62,6 +62,12 @@ export class SlopeChartComponent implements OnInit {
 			.attr("r", radius)
 			.style("fill", function(d, i){ return color[color.length - 1 - i]})
 			.attr("transform", 'translate(' + (placeLegend) + ',30)')
+			.on('mouseover', function(d){
+				d3.select(this).attr("r", 1.4 * radius)
+			})
+			.on('mouseout', function(d){
+				d3.select(this).attr("r",  radius)
+			})
 			.on('click', function(d, i){
 				const names = Array.from(new d3.InternSet(Z))
 				let arr_player: d3.DSVRowString<string>[] = []
