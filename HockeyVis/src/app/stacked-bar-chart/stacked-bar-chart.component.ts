@@ -110,6 +110,12 @@ export class StackedBarChartComponent implements OnInit {
 			.style('font-size', 20)
 			.text('Nombre de tirs');
 		svg.append('text')
+			.attr('text-anchor', 'middle')
+			.attr('transform', 'translate(' + widthChart/2 + ',' + -20 + ')')
+			.style('font-family', 'Helvetica')
+			.style('font-size', 24)
+			.text("Évolution du nombre de tirs durant les 15 dernières années");	
+		svg.append('text')
 			.attr("transform", 'translate(' + (placeLegend) + ',200)')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
