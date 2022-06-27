@@ -300,6 +300,12 @@ export class BackToBackChartComponent implements OnInit {
       .on('click',  function(d: any){
         callTeam(d.srcElement.__data__)
       })
+      .on('mouseover',  function(d:any){
+        d3.select(d.srcElement).attr('fill', 'white')
+      })
+      .on('mouseout',  function(d:any){
+        d3.select(d.srcElement).attr('fill', 'black')
+      })
   }
 
   changeTeam(team: string) : void{
