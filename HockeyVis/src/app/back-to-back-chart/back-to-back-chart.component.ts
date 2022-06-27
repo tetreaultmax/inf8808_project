@@ -8,12 +8,14 @@ import { TeamsService } from '../teams.service';
 import { environment } from 'src/environments/environment';
 
 const margin = {top: 20, right: 30, bottom: 40, left: 90},
-    height = 600 - margin.top - margin.bottom;
+      height = 600 - margin.top - margin.bottom;
+
 @Component({
   selector: 'app-back-to-back-chart',
   templateUrl: './back-to-back-chart.component.html',
   styleUrls: ['./back-to-back-chart.component.css']
 })
+
 export class BackToBackChartComponent implements OnInit {
   public width : number = window.innerWidth
   private chartWidth : number = 0.45 * this.width
@@ -32,30 +34,20 @@ export class BackToBackChartComponent implements OnInit {
   }  
   
   private setChart() : void{
-    this.loadData()
+    for (const year of YEARS){
+      d3.csv('../assets/team_goal/team_goal_data_' + year.toString() + '.csv').then(data => {
+        data.map(d => {
+          const teamByYear = this.teams.getTeamByName(String(d['team'])).getSeasonByYear(year)
+          teamByYear.goalsScored = Number(d['goals_for'])
+          teamByYear.goalsAgainst = Number(d['goals_against'])
+        })
+      })
+    }
     const buildBarChart = () => {
       this.prepareChart()
       this.buildBarChart()
     }
     setTimeout( buildBarChart, 500)
-  }
-
-  private loadData() : void {
-    const fileDirectory = '/assets/team_goal/team_goal_data_'
-    for (const year of YEARS){
-      this.http.get(environment.host + fileDirectory + year.toString() + '.csv', {responseType: 'text'})
-                  .subscribe(data => this.parseData(year, data));
-    }
-  }
-
-  private parseData(year: number, data: string){
-    const list = data.split('\n')
-    for (const season of list.slice(1, list.length -1)){
-      const teamSeason = season.split(',')
-      const teamByYear = this.teams.getTeamByName(teamSeason[0]).getSeasonByYear(year)
-      teamByYear.goalsScored = Number(teamSeason[1])
-      teamByYear.goalsAgainst = Number(teamSeason[2])
-    }
   }
 
   private prepareChart(){
