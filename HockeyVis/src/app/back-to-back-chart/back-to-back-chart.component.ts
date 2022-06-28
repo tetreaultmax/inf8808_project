@@ -133,7 +133,7 @@ export class BackToBackChartComponent implements OnInit {
     svg.append('text')
       .attr("transform", "translate(" + (this.width/2) + "," + (height + this.xAxisHeight + this.legendHeight )  + ")")
       .style('text-anchor', 'middle')
-      .text('Saison')
+      .text('Saisons')
       .attr('font-size', this.xAxisHeight)
   }
 
@@ -258,7 +258,7 @@ export class BackToBackChartComponent implements OnInit {
   positionTeamMenu() :void{
     d3.select('.menu').selectAll('.bar-chart').attr('class', 'menu')
       .attr('width', this.chartWidth)
-      .attr('height', this.legendHeight) 
+      .attr('height', this.legendHeight)
     
     const g = d3.select('.menu') as any
     
