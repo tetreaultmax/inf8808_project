@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BackToBackChartComponent } from './back-to-back-chart/back-to-back-chart.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -10,7 +9,7 @@ import { UnivariateScatterPlotComponent } from './univariate-scatter-plot/univar
 import { SlopeChartComponent } from './slope-chart/slope-chart.component';
 
 @NgModule({
-  declarations: [		
+  declarations: [
     AppComponent,
     BackToBackChartComponent,
       StackedBarChartComponent,
@@ -19,11 +18,10 @@ import { SlopeChartComponent } from './slope-chart/slope-chart.component';
    ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { 
+export class AppModule {
 }

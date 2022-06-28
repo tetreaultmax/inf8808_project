@@ -1,16 +1,14 @@
-<ul>
-	<li><a routerLink="/backToBack">Back to back chart</a></li>
-	<li><a routerLink="/stackedBar">Stacked bar chart</a></li>
-	<li><a routerLink="/univariateScatter">Univariate scatter plot</a></li>
-	<li><a routerLink="/slopeChart">Slope Chart</a></li>
-</ul>
-<router-outlet></router-outlet>
-<p>
-	Pour voir une visualisation, cliquez sur un onglet.
-</p>
-<p>
-	Il y a deux visualisations dans le premier onglet et univariate scatter plot n'est pas terminé
-</p>
-<p>
-	La mise en page du site n'est pas terminé
-</p>
+<div class="container">
+  <section>
+    <app-back-to-back-chart></app-back-to-back-chart>
+  </section>
+  <section>
+    <app-stacked-bar-chart></app-stacked-bar-chart>
+  </section>
+  <section>
+    <app-univariate-scatter-plot></app-univariate-scatter-plot>
+  </section>
+  <section>
+    <app-slope-chart></app-slope-chart>
+  </section>
+</div>
