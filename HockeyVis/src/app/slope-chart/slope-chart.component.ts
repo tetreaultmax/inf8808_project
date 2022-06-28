@@ -25,10 +25,7 @@ export class SlopeChartComponent implements OnInit {
 		const Z = data.map(d => {
 			return String(d['player'])
 		})
-		var color = ['#67001f','#b2182b','#d6604d','#f4a582','#fddbc7','#d1e5f0','#92c5de','#4393c3','#2166ac','#053061']
-		var dictPlayer = {0: "Joe Thornton", 1: 'Alex Ovechkin', 2: "Sidney Crosby", 3: "Patrick Kane",
-					4: "Evgeni Malkin", 5: "Anze Kopitar", 6: "Ryan Getzlaf", 7: "Nicklas Backstrom",
-					8: "Jason Spezza", 9: "Patrice Bergeron"}
+		var color = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a']
 		var margin = 50;
 		var marginTop = 50
 		var marginSide = 100
@@ -146,7 +143,27 @@ export class SlopeChartComponent implements OnInit {
 			.attr('transform', 'translate(' + widthChart/2 + ',' + -20 + ')')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 24)
-			.text("Évolution du nombre de points des meilleurs pointeurs de l'histoire encore actif");	
+			.text("Évolution du nombre de points des meilleurs pointeurs de l'histoire encore actif");
+		const allPlayers = Array.from(new d3.InternSet(Z))
+		let all_stats: any[] = []
+		allPlayers.forEach((player, i) => {
+			let arr_player: d3.DSVRowString<string>[] = []
+			data.forEach(d => {
+				if (d['player'] == player){
+					arr_player.push(d)
+				}
+			})
+			all_stats.push(arr_player)
+		})
+		all_stats.forEach((d, i) => {
+			const lineGroup = svg.append('g').append('path').attr('id', 'line_' + String(i)).style('fill', 'none').style('stroke', color[color.length - 1 - i]).style('stroke-width', '2px')
+			const line = d3.line().x(year => year[0]).y(year => year[1])
+			const points: [number, number][] = d.map((point: { [x: string]: any; }) => [
+					Number(xScale(String(point['year']))),
+					yScale(Number(point['points']))]
+			)
+			lineGroup.attr('d', line(points))
+		})	
 	})
   }
 }
