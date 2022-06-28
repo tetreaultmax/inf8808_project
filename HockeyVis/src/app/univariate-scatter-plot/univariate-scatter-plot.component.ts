@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from "d3";
-import {randomNormal} from "d3";
+import {randomExponential, randomNormal} from "d3";
 
 @Component({
   selector: 'app-univariate-scatter-plot',
@@ -83,17 +83,22 @@ export class UnivariateScatterPlotComponent implements OnInit {
         .attr("transform", "translate(" + 5 * widthChart / 6 + ",0)")
 
       let histogram = d3.bin()
+      let buckets = histogram(data.map(d => Number(d["Seconds_Elapsed"])/60))
 
-      svg.selectAll("dot")
-        .data(data)
-        .enter()
-        .append("circle")
-        .attr("class", "dot")
-        .attr("cx", function (d) {
-          return xScale(Number(d["Seconds_Elapsed"])/60)
-        })
-        .attr("cy", randomNormal(heightChart/2, 25))
-        .attr('r', 3)
+      buckets.forEach((value) => {
+        svg.selectAll("dot")
+          .data(value)
+          .enter()
+          .append("circle")
+          .attr("class", "dot")
+          .attr("cx", function (d) {
+            return xScale(d)
+          })
+          .attr("cy", randomNormal(heightChart/2, value.length/3))
+          .attr('r', 5)
+          .style("opacity", "50%")
+          .style("fill", "rgb(43, 140, 190)")
+      })
     })
   }
 }
