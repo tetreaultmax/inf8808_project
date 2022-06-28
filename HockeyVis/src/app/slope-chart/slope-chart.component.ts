@@ -33,7 +33,7 @@ export class SlopeChartComponent implements OnInit {
 		const heightChart = 0.8 * height
 		const marginTop = 0.1 * height
     	const marginSide = 0.1 * width
-		const spaceLegend = 50
+		const spaceLegend = 0.2 * marginSide
 		var radius = 10
 		var svg = d3.select("#lineChart")
 			.append("svg")
