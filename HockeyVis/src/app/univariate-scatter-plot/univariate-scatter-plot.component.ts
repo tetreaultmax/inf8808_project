@@ -30,11 +30,11 @@ export class UnivariateScatterPlotComponent implements OnInit {
   ngOnInit(): void{
 
     const width = window.innerWidth;
-    const height = 0.7 * window.innerHeight;
-    const widthChart = 0.7 * width
-    const heightChart = 0.7 * height
-    const marginTop = 50
-    const marginSide = 100
+    const height = window.innerHeight;
+    const widthChart = 0.8 * width
+    const heightChart = 0.8 * height
+    const marginTop = 0.1 * height
+    const marginSide = 0.1 * width
     const mockData = Array.from({length: 100}, () => Math.floor(Math.random() * 60));
 
     d3.csv("/assets/goal_times.csv").then((data) =>{
@@ -59,7 +59,7 @@ export class UnivariateScatterPlotComponent implements OnInit {
 
       svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + (heightChart - 50) + ")")
+        .attr("transform", "translate(0," + (heightChart/2) + ")")
         .call(xAxis)
         .selectAll(".tick line, .tick text")
         .attr("transform", "translate(0,-15)")
@@ -92,7 +92,7 @@ export class UnivariateScatterPlotComponent implements OnInit {
         .attr("cx", function (d) {
           return xScale(Number(d["Seconds_Elapsed"])/60)
         })
-        .attr("cy", randomNormal(heightChart - 50, 25))
+        .attr("cy", randomNormal(heightChart/2, 25))
         .attr('r', 3)
     })
   }
