@@ -7,14 +7,16 @@ import { HttpClientModule } from '@angular/common/http';
 import { StackedBarChartComponent } from './stacked-bar-chart/stacked-bar-chart.component';
 import { UnivariateScatterPlotComponent } from './univariate-scatter-plot/univariate-scatter-plot.component';
 import { SlopeChartComponent } from './slope-chart/slope-chart.component';
+import { MainPageComponent } from './main-page/main-page.component';
 
 @NgModule({
-  declarations: [
+  declarations: [	
     AppComponent,
     BackToBackChartComponent,
       StackedBarChartComponent,
       UnivariateScatterPlotComponent,
-      SlopeChartComponent
+      SlopeChartComponent,
+      MainPageComponent
    ],
   imports: [
     BrowserModule,
