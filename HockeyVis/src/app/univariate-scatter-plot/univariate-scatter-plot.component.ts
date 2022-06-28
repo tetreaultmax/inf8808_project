@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from "d3";
-import {randomExponential, randomNormal} from "d3";
+import { randomNormal} from "d3";
 
 @Component({
   selector: 'app-univariate-scatter-plot',
@@ -12,30 +12,14 @@ export class UnivariateScatterPlotComponent implements OnInit {
 
   constructor() { }
 
-  movingAverage(values: number[], N: number): Float64Array{
-    let i = 0;
-    let sum = 0;
-    const means = new Float64Array(values.length).fill(NaN);
-    for (let n = Math.min(N - 1, values.length); i < n; ++i) {
-      sum += values[i];
-    }
-    for (let n = values.length; i < n; ++i) {
-      sum += values[i];
-      means[i] = sum / N;
-      sum -= values[i - N + 1];
-    }
-    return means;
-  }
-
   ngOnInit(): void{
 
     const width = window.innerWidth;
     const height = window.innerHeight;
     const widthChart = 0.8 * width
-    const heightChart = 0.8 * height
-    const marginTop = 0.1 * height
-    const marginSide = 0.1 * width
-    const mockData = Array.from({length: 100}, () => Math.floor(Math.random() * 60));
+    const heightChart = 0.5 * height
+    const marginTop = (height - heightChart)/2
+    const marginSide = (width-widthChart)/2
 
     d3.csv("/assets/goal_times.csv").then((data) =>{
       let svg = d3.select("#univariateScatter")
@@ -54,15 +38,27 @@ export class UnivariateScatterPlotComponent implements OnInit {
 
       let xAxis = d3.axisBottom(xScale)
         .ticks(4)
-        .tickSize(30)
+        .tickSize(heightChart/1.5)
         .tickSizeOuter(0)
+        .tickFormat(x => `${x} minutes`)
+
 
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + (heightChart/2) + ")")
         .call(xAxis)
-        .selectAll(".tick line, .tick text")
-        .attr("transform", "translate(0,-15)")
+        .selectAll(".tick line")
+        .attr("transform", "translate(0," + (-heightChart/3) + ")")
+
+      svg.select("g.x.axis")
+        .selectAll(".tick text")
+        .attr("transform", "translate(0," + (12-heightChart/3) + ")")
+        .style("font-size", "12px")
+
+      svg.selectAll('.axis line, .axis path')
+        .style('stroke-width', '3px')
+        .style('stroke', 'grey');
+
 
       let periodGroup = svg.append("g")
         .attr("class", "period legend")
