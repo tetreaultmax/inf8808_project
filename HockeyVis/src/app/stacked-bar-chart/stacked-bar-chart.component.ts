@@ -21,15 +21,13 @@ export class StackedBarChartComponent implements OnInit {
 
 		var colors = ['#2b8cbe', '#7bccc4', '#bae4bc','#f0f9e8'];
 		var categories = ["shots", "misses", "blocked", "goals"]
-		var margin = 50;
-		var marginTop = 50
-		var marginSide = 100
-		var width = 0.9 * window.innerWidth;
-		var height = 0.8* window.innerHeight;
-		var widthChart = 0.7 * width
-		var heightChart = 0.9 * height
-		var placeLegend = widthChart + 10
-		var spaceLegend = 50
+		const width = window.innerWidth;
+    	const height = window.innerHeight;
+    	const widthChart = 0.8 * width
+		const heightChart = 0.8 * height
+		const marginTop = 0.1 * height
+    	const marginSide = 0.07 * width
+		const spaceLegend = 0.1 * heightChart
 		var radius = 10
 		var keys = ["Buts", "Tirs bloqués", "Tirs ratés", "Tirs tentés"]
 		var stackedData = d3.stack().keys(categories)(new_data)
@@ -43,7 +41,7 @@ export class StackedBarChartComponent implements OnInit {
 			.append("g")
 			.attr("width", widthChart)
 			.attr("height",heightChart)
-			.attr("transform", 'translate(' + 1.2*marginSide + ',' + marginTop + ')')
+			.attr("transform", 'translate(' + marginSide + ',' + marginTop + ')')
 
 		svg.selectAll("mydots")
 			.data(keys)
@@ -53,7 +51,7 @@ export class StackedBarChartComponent implements OnInit {
 			.attr("cy", function(d,i){ return i*spaceLegend})
 			.attr("r", radius)
 			.style("fill", function(d, i){ return colors[colors.length - 1 - i]})
-			.attr("transform", 'translate(' + (placeLegend) + ',0)')
+			.attr("transform", 'translate(' + (widthChart + 10) + ',0)')
 		svg.selectAll("mylabels")
 			.data(keys)
 			.enter()
@@ -64,7 +62,7 @@ export class StackedBarChartComponent implements OnInit {
 			.style("alignment-baseline", "middle")
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
-			.attr("transform", 'translate(' + (placeLegend + 10) + ',0)')
+			.attr("transform", 'translate(' + (widthChart + 20) + ',0)')
 
 		var domain = data.map(function(d) { return String(d['year']); })
 		var xScale = d3.scaleBand().padding(1).domain(domain).range([0, widthChart])
@@ -79,7 +77,7 @@ export class StackedBarChartComponent implements OnInit {
 
 		var yScale = d3.scaleLinear()
 			.domain([0, max]).nice()
-			.range([heightChart - margin, 0]);
+			.range([heightChart - marginTop, 0]);
 
 		var yAxis = d3.axisLeft(yScale).tickSize(-widthChart)
 
@@ -93,7 +91,7 @@ export class StackedBarChartComponent implements OnInit {
 
 		svg.append("g")
 			.attr("class", "x axis")
-			.attr("transform", "translate(0," + (heightChart - margin) + ")")
+			.attr("transform", "translate(0," + (heightChart - marginTop) + ")")
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.call(xAxis);
@@ -105,7 +103,7 @@ export class StackedBarChartComponent implements OnInit {
 			.text('Saisons');
 		svg.append('text')
 			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(' + -2 * marginTop + ',' + (heightChart - margin)/2 + ')rotate(-90)')
+			.attr('transform', 'translate(' + -marginTop + ',' + (heightChart - marginTop)/2 + ')rotate(-90)')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.text('Nombre de tirs');
@@ -116,7 +114,7 @@ export class StackedBarChartComponent implements OnInit {
 			.style('font-size', 24)
 			.text("Évolution du nombre de tirs durant les 15 dernières années");	
 		svg.append('text')
-			.attr("transform", 'translate(' + (placeLegend) + ',200)')
+			.attr("transform", 'translate(' + (widthChart) + ',' + heightChart/2+ ')')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.attr('id', 'tooltip')
