@@ -24,7 +24,7 @@ export class StackedBarChartComponent implements OnInit {
 		const width = window.innerWidth;
     	const height = window.innerHeight;
     	const widthChart = 0.8 * width
-		const heightChart = 0.8 * height
+		const heightChart = 0.6 * height
 		const marginTop = 0.1 * height
     	const marginSide = 0.07 * width
 		const spaceLegend = 0.1 * heightChart
@@ -107,12 +107,6 @@ export class StackedBarChartComponent implements OnInit {
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.text('Nombre de tirs');
-		svg.append('text')
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(' + widthChart/2 + ',' + -20 + ')')
-			.style('font-family', 'Helvetica')
-			.style('font-size', 24)
-			.text("Évolution du nombre de tirs durant les 15 dernières années");	
 		svg.append('text')
 			.attr("transform", 'translate(' + (widthChart) + ',' + heightChart/2+ ')')
 			.style('font-family', 'Helvetica')

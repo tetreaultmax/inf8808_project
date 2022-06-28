@@ -30,7 +30,7 @@ export class LineChartComponent implements OnInit {
 		const width = window.innerWidth;
     	const height = window.innerHeight;
     	const widthChart = 0.8 * width
-		const heightChart = 0.8 * height
+		const heightChart = 0.6 * height
 		const marginTop = 0.1 * height
     	const marginSide = 0.1 * width
 		const spaceLegend = 0.2 * marginSide
@@ -139,12 +139,6 @@ export class LineChartComponent implements OnInit {
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.text('Nombres de points');
-		svg.append('text')
-			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(' + widthChart/2 + ',' + -20 + ')')
-			.style('font-family', 'Helvetica')
-			.style('font-size', 24)
-			.text("Évolution du nombre de points des meilleurs pointeurs de l'histoire encore actif");
 		const allPlayers = Array.from(new d3.InternSet(Z))
 		let all_stats: any[] = []
 		allPlayers.forEach((player, i) => {

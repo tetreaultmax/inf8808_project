@@ -39,3 +39,6 @@ ul {
     justify-content: center;
     align-content: center;
   }
+  .container {
+    background-color: #c9d7e6;
+}
