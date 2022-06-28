@@ -59,6 +59,7 @@ export class SlopeChartComponent implements OnInit {
 			.attr("r", radius)
 			.style("fill", function(d, i){ return color[color.length - 1 - i]})
 			.attr("transform", 'translate(' + (placeLegend) + ',30)')
+			.style('cursor', 'pointer')
 			.on('mouseover', function(d){
 				d3.select(this).attr("r", 1.4 * radius)
 			})

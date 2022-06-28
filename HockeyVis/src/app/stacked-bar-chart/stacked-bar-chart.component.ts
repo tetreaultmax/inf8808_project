@@ -128,11 +128,12 @@ export class StackedBarChartComponent implements OnInit {
 			.style("fill", function(d, i) { return colors[i]; })
 
 
-
+		
 		groups.selectAll("rect")
 			.data(function(d) { return d; })
 			.enter()
 			.append("rect")
+			.attr("id", "bar")
 			.attr('width', 40)
 			.attr("x", function(d) { return +(xScale(String(d.data['year'])) as Number); })
 			.attr("y", function(d) { return yScale(d[1]); })
@@ -141,8 +142,12 @@ export class StackedBarChartComponent implements OnInit {
 			.on('mouseover', (event, d) => {
 				d3.select('#tooltip').text(`Fréquence de tirs: ${d[1] - d[0]}`).style('opacity', 1).style('font-family', 'Helvetica')
 				.style('font-size', 20)
+				d3.select(event.target).style('filter', 'brightness(50%)')
 			  })
-			.on('mouseout', () => d3.select('#tooltip').style('opacity', 0));
+			.on('mouseout', event => {
+				d3.select('#tooltip').style('opacity', 0);
+				d3.select(event.target).style('filter', 'brightness(100%)')
+			});
 		}
 		buildBarChart()
 	})
