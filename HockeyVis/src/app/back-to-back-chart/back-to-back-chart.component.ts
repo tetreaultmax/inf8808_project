@@ -1,11 +1,10 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { HttpClient, ɵHttpInterceptingHandler } from '@angular/common/http';
 import * as d3 from 'd3';
-import {  TEAM_NAMES, YEARS } from 'src/assets/constants';
+import {  TEAM_NAMES, TEAM_NAMES_MAP, YEARS } from 'src/assets/constants';
 import { ChordDiagramService } from '../chord-diagram.service';
 import { ScaleService } from '../scale.service';
 import { TeamsService } from '../teams.service';
-import { environment } from 'src/environments/environment';
 
 const margin = {top: 20, right: 30, bottom: 40, left: 90},
       height = 600 - margin.top - margin.bottom;
@@ -17,7 +16,7 @@ const margin = {top: 20, right: 30, bottom: 40, left: 90},
 })
 
 export class BackToBackChartComponent implements OnInit {
-  public width : number = window.innerWidth
+  public width : number = 0.9* window.innerWidth
   private chartWidth : number = 0.45 * this.width
   public yAxisWidth : number = 0.1 * this.width
   public legendHeight : number = 40
@@ -26,13 +25,13 @@ export class BackToBackChartComponent implements OnInit {
   private xScale!: d3.ScaleLinear<number, number, never>
   private yScale!: d3.ScaleBand<string>
   private color  = 'gray'
-  constructor(private http: HttpClient, private teams: TeamsService, private scale: ScaleService, private chordDiagram : ChordDiagramService) { 
+  constructor(private http: HttpClient, private teams: TeamsService, private scale: ScaleService, private chordDiagram : ChordDiagramService) {
   }
 
   ngOnInit(): void {
     this.setChart()
-  }  
-  
+  }
+
   private setChart() : void{
     for (const year of YEARS){
       d3.csv('../assets/team_goal/team_goal_data_' + year.toString() + '.csv').then(data => {
@@ -47,7 +46,7 @@ export class BackToBackChartComponent implements OnInit {
       this.prepareChart()
       this.buildBarChart()
     }
-    setTimeout( buildBarChart, 500)
+    setTimeout( buildBarChart, 700)
   }
 
   private prepareChart(){
@@ -56,11 +55,11 @@ export class BackToBackChartComponent implements OnInit {
     this.yScale =  this.scale.getYScale(height)
     this.buildYAxe()
     this.buildXAxe()
-    this.appendRectanglesMenu()  
-    this.xScale =  this.scale.getXScale(this.chartWidth, this.selectedTeam) 
+    this.appendRectanglesMenu()
+    this.xScale =  this.scale.getXScale(this.chartWidth, this.selectedTeam)
   }
 
-  public buildBarChart() : void{  
+  public buildBarChart() : void{
     this.buildLegend()
     this.positionTeamMenu()
     this.appendRectangles('.leftChart')
@@ -72,7 +71,7 @@ export class BackToBackChartComponent implements OnInit {
   }
 
   private buildYAxe(): void{
-    const callChordDiagram = (year : string) : void => this.chordDiagram.display(year, this.selectedTeam, this.width, height, this.legendHeight) 
+    const callChordDiagram = (year : string) : void => this.chordDiagram.display(year, this.selectedTeam, this.width, height, this.legendHeight)
     const svg = d3.select('.y.axis')
     .attr('width', this.yAxisWidth)
     .attr("transform", "translate(" + (this.chartWidth + this.yAxisWidth/2 + 3)  + "," + this.legendHeight + ")")
@@ -101,20 +100,21 @@ export class BackToBackChartComponent implements OnInit {
     const legend = d3.select('.legend')
       .attr("width", this.width)
       .attr("height", this.legendHeight)
-    
+
     legend.append('g')
       .append('circle')
       .attr('fill', color)
-      .attr('r', 5)
+      .attr('r', 10)
       .attr('cx', 50)
       .attr('cy', this.legendHeight/2)
-      
+
     legend.append('text')
-      .text(this.selectedTeam)
+      .text(TEAM_NAMES_MAP.get(this.selectedTeam) as unknown as string)
       .attr('x', 65)
       .attr('y', this.legendHeight/2)
       .style('text-anchor', 'left')
       .style('alignment-baseline', 'middle')
+      .attr('font-size', 0.75* this.legendHeight)
   }
 
   private buildXAxe(): void{
@@ -122,18 +122,18 @@ export class BackToBackChartComponent implements OnInit {
       .attr("width", this.width)
       .attr("height", this.xAxisHeight + 10)
     svg.append('text')
-      .attr("transform", "translate(" + 0 + "," + (height + this.xAxisHeight + this.legendHeight)  + ")")
+      .attr("transform", "translate(" + 10 + "," + (height + this.xAxisHeight + this.legendHeight)  + ")")
       .text('Buts encaissés')
       .attr('font-size', this.xAxisHeight)
     svg.append('text')
-      .attr("transform", "translate(" + (this.width - margin.right) + "," + (height + this.xAxisHeight + this.legendHeight )  + ")")
+      .attr("transform", "translate(" + (this.width - 10) + "," + (height + this.xAxisHeight + this.legendHeight )  + ")")
       .style('text-anchor', 'end')
       .text('Buts marqués')
       .attr('font-size', this.xAxisHeight)
     svg.append('text')
       .attr("transform", "translate(" + (this.width/2) + "," + (height + this.xAxisHeight + this.legendHeight )  + ")")
       .style('text-anchor', 'middle')
-      .text('Saisons')
+      .text('Saison')
       .attr('font-size', this.xAxisHeight)
   }
 
@@ -147,7 +147,7 @@ export class BackToBackChartComponent implements OnInit {
     d3.select('#rightChart')
         .attr("width", this.chartWidth)
         .attr("height", height)
-  } 
+  }
 
   private appendRectangles(toSelect : string) : void{
     const team = this.teams.getTeamByName(this.selectedTeam).seasons
@@ -163,7 +163,7 @@ export class BackToBackChartComponent implements OnInit {
     g.append('text')
       .attr('class', this.selectedTeam)
   }
-  
+
   private addLeftBands() : void{
     const g = d3.select('.leftChart') as any
     const color = this.color
@@ -180,7 +180,7 @@ export class BackToBackChartComponent implements OnInit {
       .on('mouseout',  function(d: any){
         d3.select(d.target).attr('height',sizeBar).attr('fill', color)
       })
-      
+
     g.selectAll('text.' + this.selectedTeam)
       .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))!  + sizeBar/2 + this.legendHeight + 2 })
       .attr('x', (d: { goalsAgainst: number }) => { return this.chartWidth - this.xScale(d.goalsAgainst) + 5 })
@@ -207,7 +207,7 @@ export class BackToBackChartComponent implements OnInit {
       .on('mouseout',  function(d: any){
         d3.select(d.target).attr('height',sizeBar).attr('fill', color)
       })
-    
+
     g.selectAll('text.' + this.selectedTeam)
       .attr('y', (d: { year: number }) => { return this.yScale(d.year + '-' + (d.year + 1))! + sizeBar/2 + this.legendHeight + 2 })
       .attr('x', (d: { goalsScored: number }) => { return this.chartWidth + this.yAxisWidth + this.xScale(d.goalsScored) - 5; })
@@ -242,6 +242,7 @@ export class BackToBackChartComponent implements OnInit {
     .style('padding', '10px')
     .style('visibility', 'hidden')
     .style('background-color', 'blue')
+    .style('opacity', 0.95)
     .attr('x', 65)
     .attr('y', this.legendHeight/2)
   }
@@ -259,21 +260,21 @@ export class BackToBackChartComponent implements OnInit {
     d3.select('.menu').selectAll('.bar-chart').attr('class', 'menu')
       .attr('width', this.chartWidth)
       .attr('height', this.legendHeight)
-    
+
     const g = d3.select('.menu') as any
-    
+
     const width = (3/2 * this.chartWidth + this.yAxisWidth)/TEAM_NAMES.length*2 *0.9
-    const height = this.legendHeight/2 
+    const height = this.legendHeight/2
     const chartWidth = this.chartWidth
     const callTeam = (team : string) : void => this.changeTeam(team)
     g.selectAll('rect')
       .attr('x', function(d : any,i: number): number{
-        return (i < TEAM_NAMES.length/2) ? width * i + chartWidth/2 : width * (i - TEAM_NAMES.length/2) + chartWidth/2
+        return (i < TEAM_NAMES.length/2) ? width * i + chartWidth/3 + width: width * (i - TEAM_NAMES.length/2) + chartWidth/3 + width/2
       })
       .attr('y', function(d : any,i: number): number{
         return (i < TEAM_NAMES.length/2) ? 0 : height
       })
-      .attr('fill', '#D3D3D3')
+      .attr('fill', this.color  )
       .attr('stroke', 'black')
       .attr('width', width)
       .attr('height', height * 0.9)
@@ -281,15 +282,15 @@ export class BackToBackChartComponent implements OnInit {
       .on('click',  function(d: any){
         callTeam(d.srcElement.__data__)
       })
-    
+
     g.selectAll('text')
       .attr('width', width)
       .attr('height', height * 0.9)
       .attr('x', function(d : any,i: number): number{
-        return (i < TEAM_NAMES.length/2) ? width * i + chartWidth/2 + width/2 : width * (i - TEAM_NAMES.length/2) + chartWidth/2 + + width/2 
+        return (i < TEAM_NAMES.length/2) ? width * i + chartWidth/3 + 3*width/2 : width * (i - TEAM_NAMES.length/2) + chartWidth/3 + width
       })
       .attr('y', function(d : any,i: number): number{
-        return (i < TEAM_NAMES.length/2) ? height *0.8 : 2*(height*0.9)
+        return (i < TEAM_NAMES.length/2) ? height *0.8  : 2*(height*0.9)
       })
       .attr('fill', 'black')
       .style('alignment-baseline', 'baseline')

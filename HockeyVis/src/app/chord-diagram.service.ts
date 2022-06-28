@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
+import { TEAM_NAMES_MAP } from 'src/assets/constants';
 import { environment } from 'src/environments/environment';
 import { ScaleService } from './scale.service';
 
@@ -27,7 +28,7 @@ export class ChordDiagramService {
       .attr('opacity', 0.97)
       .attr('fill', 'white')
       .attr('stroke', 'black')
-    
+
       this.buildDisplay(g, width, height, legendHeight, year, team)
   }
 
@@ -46,17 +47,16 @@ export class ChordDiagramService {
   private buildTitle(team : string, width : number, height : number, year : string){
     d3.select('#panel').select('g')
       .append('text')
-      .text('Allo')
       .attr('x', width/2)
       .attr('y', height)
       .attr('text-anchor', 'middle')
       .attr('font-size', 25)
-      .text('Collaboration entre les meilleurs marqueurs de ' + team + ' durant la saison ' + year + '.')
+      .text('Collaboration entre les meilleurs marqueurs de ' + TEAM_NAMES_MAP.get(team) + ' durant la saison ' + year + '.')
 
   }
 
   private buildCloseWindow(g : d3.Selection<SVGGElement, unknown, HTMLElement, any>, x : number, y:number ){
-    const closeWindow = () : void => this.closeWindow() 
+    const closeWindow = () : void => this.closeWindow()
     g.append('text')
     .attr('x', x)
     .attr('y', y)
@@ -76,7 +76,7 @@ export class ChordDiagramService {
     this.http.get(environment.host + fileDirectory + team + '.csv', {responseType: 'text'})
       .subscribe(data => this.parseData(data),
       () => this.handleError())
-      
+
   }
 
   private handleError(){
@@ -84,7 +84,7 @@ export class ChordDiagramService {
     d3.select('#error').attr('visibility', 'visible')
     d3.select('#panel').select('rect').style('visibility', 'visible')
     d3.select('#panel').select('text').style('visibility', 'visible')
-    
+
   }
 
   private buildErrorMessage(width: number, height: number){
@@ -107,7 +107,7 @@ export class ChordDiagramService {
       const newRow = points.slice(1, this.numberPlayers + 1).map(function(item){ return parseInt(item)})
       this.players.push(playerName)
       this.matrix[counter] = newRow
-      if (++ counter === this.numberPlayers) return      
+      if (++ counter === this.numberPlayers) return
     }
   }
 
@@ -123,7 +123,7 @@ export class ChordDiagramService {
   }
 
   private buildRibbons(svg: any, res:any, width: number, height: number){
-    const colorScale = this.scaleService.getColorScale(this.players) 
+    const colorScale = this.scaleService.getColorScale(this.players)
     const players = this.players
     svg.datum(res)
     .append("g")
@@ -135,14 +135,14 @@ export class ChordDiagramService {
       .attr("d", d3.ribbon()
         .radius(200) as any
       )
-      .style("fill", function(d : any){ 
+      .style("fill", function(d : any){
         return colorScale(players[d.target.index]) as number })
       .attr('opacity', 0.8)
       .style("stroke", "black");
   }
 
   private appendPath(g: any, width : number, height:number, arc : any){
-    const colorScale = this.scaleService.getColorScale(this.players) 
+    const colorScale = this.scaleService.getColorScale(this.players)
     const players = this.players
     g.append('path')
       .attr("transform", "translate(" + width/2  + "," + 0.55 * height + ")")
@@ -193,5 +193,5 @@ export class ChordDiagramService {
       .sortSubgroups(d3.descending)
       (this.matrix)
   }
-  
+
 }
