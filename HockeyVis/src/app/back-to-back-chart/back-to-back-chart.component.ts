@@ -16,7 +16,7 @@ const margin = {top: 20, right: 30, bottom: 40, left: 90},
 })
 
 export class BackToBackChartComponent implements OnInit {
-  public width : number = 0.9* window.innerWidth
+  public width : number = window.innerWidth
   private chartWidth : number = 0.45 * this.width
   public yAxisWidth : number = 0.1 * this.width
   public legendHeight : number = 40
@@ -222,6 +222,7 @@ export class BackToBackChartComponent implements OnInit {
 
   private createElements() : void {
     const div = d3.select('#dataviz')
+      .style('padding-left', '10px')
     const svg = div.append('svg').attr('class', 'bar-chart')
       .attr('width', this.width)
       .attr('height', height + this.legendHeight + this.xAxisHeight + 10)
