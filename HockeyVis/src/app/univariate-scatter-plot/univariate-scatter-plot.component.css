@@ -2,3 +2,9 @@
   align-content: center;
   justify-content: center;
 }
+body {
+    font-family: 'Helvetica';
+    font-size: 16;
+    background-color: #c9d7e6;
+    color: #000000;
+}

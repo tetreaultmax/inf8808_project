@@ -26,15 +26,14 @@ export class SlopeChartComponent implements OnInit {
 			return String(d['player'])
 		})
 		var color = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a']
-		var margin = 50;
-		var marginTop = 50
-		var marginSide = 100
-		var width = 0.9 * window.innerWidth;
-		var height = 0.8* window.innerHeight;
-		var widthChart = 0.7 * width
-		var heightChart = 0.9 * height
-		var placeLegend = widthChart + 10
-		var spaceLegend = 50
+		
+		const width = window.innerWidth;
+    	const height = window.innerHeight;
+    	const widthChart = 0.8 * width
+		const heightChart = 0.8 * height
+		const marginTop = 0.1 * height
+    	const marginSide = 0.1 * width
+		const spaceLegend = 50
 		var radius = 10
 		var svg = d3.select("#lineChart")
 			.append("svg")
@@ -44,12 +43,7 @@ export class SlopeChartComponent implements OnInit {
 			.append("g")
 			.attr("width", widthChart)
 			.attr("height",heightChart)
-			.attr("transform", 'translate(' + 1.2*marginSide + ',' + marginTop + ')')
-		svg.append('text')
-			.attr("transform", 'translate(' + (placeLegend) + ',0)')
-			.style('font-family', 'Helvetica')
-			.style('font-size', 20)
-			.text('Veuillez cliquer sur une bulle pour interagir: ');
+			.attr("transform", 'translate(' + marginSide + ',' + marginTop + ')')
 		svg.selectAll("mydots")
 			.data(Array.from(new d3.InternSet(Z)))
 			.enter()
@@ -58,7 +52,7 @@ export class SlopeChartComponent implements OnInit {
 			.attr("cy", function(d,i){ return i*spaceLegend})
 			.attr("r", radius)
 			.style("fill", function(d, i){ return color[color.length - 1 - i]})
-			.attr("transform", 'translate(' + (placeLegend) + ',30)')
+			.attr("transform", 'translate(' + (widthChart - 10) + ',0)')
 			.style('cursor', 'pointer')
 			.on('mouseover', function(d){
 				d3.select(this).attr("r", 1.4 * radius)
@@ -115,8 +109,8 @@ export class SlopeChartComponent implements OnInit {
 			.style("alignment-baseline", "middle")
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
-			.attr("transform", 'translate(' + (placeLegend + 10) + ',30)')
-		const yScale = d3.scaleLinear().domain([0, max]).range([heightChart - margin, 0])
+			.attr("transform", 'translate(' + (widthChart) + ',0)')
+		const yScale = d3.scaleLinear().domain([0, max]).range([heightChart - marginTop, 0])
 		const xDomain = d3.sort(Array.from(new d3.InternSet(X)))
 		const xScale = d3.scaleBand().domain(xDomain).range([0, widthChart])
 		const xAxis = d3.axisBottom(xScale)
@@ -129,7 +123,7 @@ export class SlopeChartComponent implements OnInit {
 
 		svg.append("g")
 			.attr("class", "x axis")
-			.attr("transform", "translate(" + -40 + "," + (heightChart - margin) + ")")
+			.attr("transform", "translate(" + -40 + "," + (heightChart - marginTop) + ")")
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.call(xAxis);
@@ -141,7 +135,7 @@ export class SlopeChartComponent implements OnInit {
 			.text('Saisons');
 		svg.append('text')
 			.attr('text-anchor', 'middle')
-			.attr('transform', 'translate(' + -2 * marginTop + ',' + (heightChart - margin)/2 + ')rotate(-90)')
+			.attr('transform', 'translate(' + (-1.1*marginTop) + ',' + (heightChart - marginSide)/2 + ')rotate(-90)')
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.text('Nombres de points');
