@@ -29,7 +29,7 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/HockeyVis//.angular/*
+/HockeyVis//.angular/cache
 .sass-cache/
 /connect.lock
 /coverage
