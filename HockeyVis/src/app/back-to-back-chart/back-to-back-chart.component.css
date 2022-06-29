@@ -8,3 +8,13 @@ body {
     background-color: #c9d7e6;
     color: #000000;
 }
+
+#title-back {
+	transform: translateX(50px);
+}
+#p1 {
+	transform: translateX(50px);
+}
+#p2 {
+	transform: translateX(50px);
+}

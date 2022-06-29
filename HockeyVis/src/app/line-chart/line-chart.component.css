@@ -4,3 +4,9 @@ body {
     background-color: #c9d7e6;
     color: #000000;
 }
+#title-line {
+	transform: translateX(50px);
+}
+#p1 {
+	transform: translateX(50px);
+}
