@@ -8,15 +8,17 @@ import { StackedBarChartComponent } from './stacked-bar-chart/stacked-bar-chart.
 import { UnivariateScatterPlotComponent } from './univariate-scatter-plot/univariate-scatter-plot.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
 import { MainPageComponent } from './main-page/main-page.component';
+import { LastPageComponent } from './last-page/last-page.component';
 
 @NgModule({
-  declarations: [	
+  declarations: [		
     AppComponent,
     BackToBackChartComponent,
       StackedBarChartComponent,
       UnivariateScatterPlotComponent,
       LineChartComponent,
-      MainPageComponent
+      MainPageComponent,
+      LastPageComponent
    ],
   imports: [
     BrowserModule,
