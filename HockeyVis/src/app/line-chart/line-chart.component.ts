@@ -25,7 +25,7 @@ export class LineChartComponent implements OnInit {
 		const Z = data.map(d => {
 			return String(d['player'])
 		})
-		var color = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a']
+		var color = ['#1f7f64','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a']
 		
 		const width = window.innerWidth;
     	const height = window.innerHeight;
