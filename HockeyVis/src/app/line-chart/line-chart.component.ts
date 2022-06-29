@@ -123,7 +123,7 @@ export class LineChartComponent implements OnInit {
 
 		svg.append("g")
 			.attr("class", "x axis")
-			.attr("transform", "translate(" + -40 + "," + (heightChart - marginTop) + ")")
+			.attr("transform", "translate(" + -50 + "," + (heightChart - marginTop) + ")")
 			.style('font-family', 'Helvetica')
 			.style('font-size', 20)
 			.call(xAxis);
