@@ -41,7 +41,7 @@ export class ChordDiagramService {
     const buildDiagram = () => {
       this.createDiagram(width, height)
     }
-    setTimeout( buildDiagram, 200)
+    setTimeout( buildDiagram, 300)
   }
 
   private buildTitle(team : string, width : number, height : number, year : string){
