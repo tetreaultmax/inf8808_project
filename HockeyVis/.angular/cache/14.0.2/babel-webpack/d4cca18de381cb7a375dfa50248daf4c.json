@@ -1,0 +1,1 @@
+{"ast":null,"code":"export default (x => () => x);","map":{"version":3,"names":["x"],"sources":["C:/Users/maxte/POLYTECHNIQUE/E22/INF8808E/Projet/inf8808_project/HockeyVis/node_modules/d3-interpolate/src/constant.js"],"sourcesContent":["export default x => () => x;\n"],"mappings":"AAAA,gBAAeA,CAAC,IAAI,MAAMA,CAA1B"},"metadata":{},"sourceType":"module"}
